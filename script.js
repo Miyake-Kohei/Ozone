@@ -13,7 +13,7 @@ class Turret{
 
     }
 
-    aim(){
+    aim(enemies){
 
     }
 
