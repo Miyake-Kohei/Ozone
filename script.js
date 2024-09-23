@@ -1,5 +1,29 @@
 let canvas,graphic,CWidth,CHeight;
 
+class Turret{
+    constructor(id,x,y){
+        this.id = id;
+        this.x = x;
+        this.y = y;
+    }
+
+    draw(){
+
+    }
+}
+
+class Enemy{
+    constructor(id,x,y){
+        this.id = id;
+        this.x = x;
+        this.y = y;
+    }
+
+    draw(){
+        
+    }
+}
+
 onload = function(){
     canvas = document.getElementById("game");
     graphic = canvas.getContext("2d");
