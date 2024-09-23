@@ -1,4 +1,6 @@
 let canvas,graphic,CWidth,CHeight;
+let enemies = [];
+let turrets = [];
 
 class Turret{
     constructor(id,x,y){
@@ -8,6 +10,10 @@ class Turret{
     }
 
     draw(){
+
+    }
+
+    aim(){
 
     }
 
@@ -28,7 +34,7 @@ class Enemy{
     }
 
     move(){
-        
+
     }
 }
 
