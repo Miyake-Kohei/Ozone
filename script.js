@@ -10,6 +10,10 @@ class Turret{
     draw(){
 
     }
+
+    shoot(){
+
+    }
 }
 
 class Enemy{
@@ -20,6 +24,10 @@ class Enemy{
     }
 
     draw(){
+
+    }
+
+    move(){
         
     }
 }
