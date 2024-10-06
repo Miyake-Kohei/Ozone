@@ -73,7 +73,7 @@ function init(){
 }
 
 function update(){
-    console.log('testtest')
+    
 }
 
 function draw(){
