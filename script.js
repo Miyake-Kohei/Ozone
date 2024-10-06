@@ -2,6 +2,18 @@ let canvas,graphic,CWidth,CHeight;
 let enemies = [];
 let turrets = [];
 
+class map{
+    constructor(){
+
+    }
+
+    draw(){
+
+    }
+
+    
+}
+
 class Turret{
     constructor(id,x,y){
         this.id = id;
