@@ -49,38 +49,43 @@ class Turret{
 }
 
 class Enemy{
-    constructor(id,x,y){
+    constructor(id,x,y,enemychip){
         this.id = id;
-        this.x, this.y = Map.enemy_base;
+        this.x = x; 
+        this.y = y;
+        this.pict = new Image();
+        this.pict.src = enemychip[0];
     }
 
     draw(){
-
+        graphic.drawImage(this.pict, map.tile0.width*x, map.tile0.height*y);
     }
 
-    move(com){
+    move(event){
         var x_candidate = this.x;
         var y_candidate = this.y;
 
-        switch(com){
-            case 1:x_candidate++;//右移動
+        switch(event.key){
+            case 'ArrowRight':x_candidate++;//右移動
                     break;
-            case 2:x_candidate--;//左移動
+            case 'ArrowLeft' :x_candidate--;//左移動
                     break;
-            case 3:y_candidate++;//上移動
+            case 'ArrowUp'   :y_candidate++;//上移動
                     break;
-            case 4:x_candidate++;//下移動
+            case 'ArrowDown' :x_candidate++;//下移動
                     break;
         }
         if(map_data[y_candidate][x_candidate]/*逆かも*/ == 0){
             this.x = x_candidate;
             this.y = y_candidate;
+        }
     }
 }
 
 onload = function(){
     canvas = document.getElementById("game");
     graphic = canvas.getContext("2d");
+
     //初期化
     init()
     //入力処理
@@ -102,7 +107,14 @@ function init(){
         'img/mapchip0.png',
         'img/mapchip1.png'
     ];
+
+    
+    const img_enemychip = [
+        'img/enemy_temp.png'
+    ];
     map = new Map(map_data, img_mapchip);
+    enemy = new Enemy(0, map.enemy_base.x, map.enemy_base.y,img_enemychip);
+    windows.addEventListener('keydown', enemy.move);
 }
 
 function update(){
@@ -110,7 +122,8 @@ function update(){
 }
 
 function draw(){
-    map.draw();    
+    map.draw();
+    enemy.draw();    
 }
 
 function gameloop(){
