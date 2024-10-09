@@ -1,25 +1,32 @@
 let canvas,graphic,CWidth,CHeight;
 let enemies = [];
 let turrets = [];
+let map;
 
-const map_data = [
-    [0,1,0,0,0,0,0],
-    [0,1,0,1,1,1,0],
-    [0,1,0,1,0,1,0],
-    [0,1,0,1,0,1,0],
-    [0,0,0,1,0,0,0]
-];
+class Map{
+    constructor(map_data, mapchip){
+        this.map_data = map_data;
+        this.tile0 = new Image();
+        this.tile1 = new Image();
+        this.tile0.src = mapchip[0];
+        this.tile1.src = mapchip[1];
+        this.enemy_base = (0,0);
+        this.player_base = (2,4);
+    }
 
-// map_data配列における場所
-const enemy_base = (0,0);
-const player_base = (2,4);
-
-// 通路0の画像パス
-// 壁1の画像パス
-const img_mapchip = [
-    'img/mapchip0.png',
-    'img/mapchip1.png'
-]
+    draw(){
+        for (let y = 0; y < this.map_data.length; y++) {
+            for (let x = 0; x < this.map_data[y].length; x++) {
+                
+                if(this.map_data[y][x]===0){
+                    graphic.drawImage(this.tile0, this.tile0.width*x, this.tile0.height*y);
+                }else{
+                    graphic.drawImage(this.tile1, this.tile1.width*x, this.tile1.height*y);
+                }
+            }
+        }
+    }
+}
 
 class Turret{
     constructor(id,x,y){
@@ -69,7 +76,19 @@ onload = function(){
 function init(){
     CWidth = canvas.width;
     CHeight = canvas.height;
-    tile = new Image();
+    const map_data = [
+        [0,1,0,0,0,0,0],
+        [0,1,0,1,1,1,0],
+        [0,1,0,1,0,1,0],
+        [0,1,0,1,0,1,0],
+        [0,0,0,1,0,0,0]
+    ];
+    
+    const img_mapchip = [
+        'img/mapchip0.png',
+        'img/mapchip1.png'
+    ];
+    map = new Map(map_data, img_mapchip);
 }
 
 function update(){
@@ -77,23 +96,7 @@ function update(){
 }
 
 function draw(){
-    drawMap();    
-}
-
-
-function drawMap() {
-    for (let y = 0; y < map_data.length; y++) {
-        for (let x = 0; x < map_data[y].length; x++) {
-            
-            if(map_data[y][x]===0){
-                tile.src = img_mapchip[0];
-            }else{
-                tile.src = img_mapchip[1];
-            }
-                graphic.drawImage(tile, tile.width*x, tile.height*y);
-        }
-
-    }
+    map.draw();    
 }
 
 function gameloop(){
