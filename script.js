@@ -58,8 +58,23 @@ class Enemy{
 
     }
 
-    move(){
+    move(com){
+        var x_candidate = this.x;
+        var y_candidate = this.y;
 
+        switch(com){
+            case 1:x_candidate++;//右移動
+                    break;
+            case 2:x_candidate--;//左移動
+                    break;
+            case 3:y_candidate++;//上移動
+                    break;
+            case 4:x_candidate++;//下移動
+                    break;
+        }
+        if(map_data[y_candidate][x_candidate]/*逆かも*/ == 0){
+            this.x = x_candidate;
+            this.y = y_candidate;
     }
 }
 
