@@ -10,8 +10,9 @@ class Map{
         this.tile1 = new Image();
         this.tile0.src = mapchip[0];
         this.tile1.src = mapchip[1];
-        this.enemy_base = (0,0);
-        this.player_base = (2,4);
+        this.enemy_base = [0,0];
+        this.player_base = [2,4];
+        console.log(this.enemy_base)
     }
 
     draw(){
@@ -54,31 +55,38 @@ class Enemy{
         this.x = x; 
         this.y = y;
         this.pict = new Image();
-        this.pict.src = enemychip[0];
+        this.pict.src = enemychip[this.id];
+        console.log(this.x);
+        console.log(this.y);
     }
 
     draw(){
-        graphic.drawImage(this.pict, map.tile0.width*x, map.tile0.height*y);
+        graphic.drawImage(this.pict, map.tile0.width*this.x, map.tile0.height*this.y);
     }
 
     move(event){
-        var x_candidate = this.x;
-        var y_candidate = this.y;
+        let x_candidate = this.x;
+        let y_candidate = this.y;
+        
 
         switch(event.key){
             case 'ArrowRight':x_candidate++;//右移動
                     break;
             case 'ArrowLeft' :x_candidate--;//左移動
                     break;
-            case 'ArrowUp'   :y_candidate++;//上移動
+            case 'ArrowUp'   :y_candidate--;//上移動
                     break;
-            case 'ArrowDown' :x_candidate++;//下移動
+            case 'ArrowDown' :y_candidate++;//下移動
                     break;
         }
-        if(map_data[y_candidate][x_candidate]/*逆かも*/ == 0){
+
+        if(map.map_data[y_candidate][x_candidate] === 0){
             this.x = x_candidate;
             this.y = y_candidate;
         }
+    }
+    attack(){
+        turre
     }
 }
 
@@ -113,8 +121,10 @@ function init(){
         'img/enemy_temp.png'
     ];
     map = new Map(map_data, img_mapchip);
-    enemy = new Enemy(0, map.enemy_base.x, map.enemy_base.y,img_enemychip);
-    windows.addEventListener('keydown', enemy.move);
+    enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    window.addEventListener('keydown', event => {
+        enemy.move(event)
+    });
 }
 
 function update(){
