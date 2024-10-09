@@ -10,8 +10,9 @@ class Map{
         this.tile1 = new Image();
         this.tile0.src = mapchip[0];
         this.tile1.src = mapchip[1];
-        this.enemy_base = (0,0);
-        this.player_base = (2,4);
+        this.enemy_base = [0,0];
+        this.player_base = [2,4];
+        console.log(this.enemy_base)
     }
 
     draw(){
@@ -49,24 +50,50 @@ class Turret{
 }
 
 class Enemy{
-    constructor(id,x,y){
+    constructor(id,x,y,enemychip){
         this.id = id;
-        this.x = x;
+        this.x = x; 
         this.y = y;
+        this.pict = new Image();
+        this.pict.src = enemychip[this.id];
+        console.log(this.x);
+        console.log(this.y);
     }
 
     draw(){
-
+        graphic.drawImage(this.pict, map.tile0.width*this.x, map.tile0.height*this.y);
     }
 
-    move(){
+    move(event){
+        let x_candidate = this.x;
+        let y_candidate = this.y;
+        
 
+        switch(event.key){
+            case 'ArrowRight':x_candidate++;//右移動
+                    break;
+            case 'ArrowLeft' :x_candidate--;//左移動
+                    break;
+            case 'ArrowUp'   :y_candidate--;//上移動
+                    break;
+            case 'ArrowDown' :y_candidate++;//下移動
+                    break;
+        }
+
+        if(map.map_data[y_candidate][x_candidate] === 0){
+            this.x = x_candidate;
+            this.y = y_candidate;
+        }
+    }
+    attack(){
+        turre
     }
 }
 
 onload = function(){
     canvas = document.getElementById("game");
     graphic = canvas.getContext("2d");
+
     //初期化
     init()
     //入力処理
@@ -88,7 +115,16 @@ function init(){
         'img/mapchip0.png',
         'img/mapchip1.png'
     ];
+
+    
+    const img_enemychip = [
+        'img/enemy_temp.png'
+    ];
     map = new Map(map_data, img_mapchip);
+    enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    window.addEventListener('keydown', event => {
+        enemy.move(event)
+    });
 }
 
 function update(){
@@ -96,7 +132,8 @@ function update(){
 }
 
 function draw(){
-    map.draw();    
+    map.draw();
+    enemy.draw();    
 }
 
 function gameloop(){
