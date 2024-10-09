@@ -12,17 +12,22 @@ class Map{
         this.tile1.src = mapchip[1];
         this.enemy_base = (0,0);
         this.player_base = (2,4);
+
+        this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
+        this.vrble_height = this.vrble_width
+        // this.vrble_height = graphic.canvas.height / Object.keys(this.map_data).length;
+
     }
 
     draw(){
         for (let y = 0; y < this.map_data.length; y++) {
             for (let x = 0; x < this.map_data[y].length; x++) {
-                
                 if(this.map_data[y][x]===0){
-                    graphic.drawImage(this.tile0, this.tile0.width*x, this.tile0.height*y);
+                    graphic.drawImage(this.tile0, this.vrble_width*x, this.vrble_height*y, this.vrble_width, this.vrble_height);
                 }else{
-                    graphic.drawImage(this.tile1, this.tile1.width*x, this.tile1.height*y);
+                    graphic.drawImage(this.tile1, this.vrble_width*x, this.vrble_height*y, this.vrble_width, this.vrble_height);
                 }
+
             }
         }
     }
@@ -89,6 +94,9 @@ function init(){
         'img/mapchip1.png'
     ];
     map = new Map(map_data, img_mapchip);
+
+
+
 }
 
 function update(){
@@ -103,3 +111,4 @@ function gameloop(){
     update();
     draw();
 }
+
