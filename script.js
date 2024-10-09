@@ -51,8 +51,7 @@ class Turret{
 class Enemy{
     constructor(id,x,y){
         this.id = id;
-        this.x = x;
-        this.y = y;
+        this.x, this.y = Map.enemy_base;
     }
 
     draw(){
