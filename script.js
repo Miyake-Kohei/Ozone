@@ -14,19 +14,15 @@ class Map{
         this.player_base = [2,4];
         console.log(this.enemy_base)
 
-        this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
-        this.vrble_height = this.vrble_width
-        // this.vrble_height = graphic.canvas.height / Object.keys(this.map_data).length;
-
     }
 
     draw(){
         for (let y = 0; y < this.map_data.length; y++) {
             for (let x = 0; x < this.map_data[y].length; x++) {
                 if(this.map_data[y][x]===0){
-                    graphic.drawImage(this.tile0, this.vrble_width*x, this.vrble_height*y, this.vrble_width, this.vrble_height);
+                    graphic.drawImage(this.tile0, this.tile0.width*x, this.tile0.height*y);
                 }else{
-                    graphic.drawImage(this.tile1, this.vrble_width*x, this.vrble_height*y, this.vrble_width, this.vrble_height);
+                    graphic.drawImage(this.tile1, this.tile1.width*x, this.tile1.height*y);
                 }
 
             }
