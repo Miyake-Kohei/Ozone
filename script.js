@@ -120,6 +120,11 @@ function init(){
         'img/mapchip0.png',
         'img/mapchip1.png'
     ];
+
+    const img_enemychip = [
+        'img/enemy_temp.png'
+    ];
+    
     map = new Map(map_data, img_mapchip);
     enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
     window.addEventListener('keydown', event => {
