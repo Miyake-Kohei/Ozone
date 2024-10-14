@@ -126,7 +126,7 @@ function init(){
     ];
     
     map = new Map(map_data, img_mapchip);
-    enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],enemychip);
+    enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
     window.addEventListener('keydown', event => {
         enemy.move(event)
     });
