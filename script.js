@@ -10,8 +10,8 @@ class Map{
         this.tile1 = new Image();
         this.tile0.src = mapchip[0];
         this.tile1.src = mapchip[1];
-        this.enemy_base = (0,0);
-        this.player_base = (2,4);
+        this.enemy_base = [0,0];
+        this.player_base = [2,4];
         console.log(this.enemy_base)
 
         this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
@@ -115,13 +115,13 @@ function init(){
         [0,1,0,1,0,1,0],
         [0,0,0,1,0,0,0]
     ];
-    
+
     const img_mapchip = [
         'img/mapchip0.png',
         'img/mapchip1.png'
     ];
     map = new Map(map_data, img_mapchip);
-    enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],enemychip);
     window.addEventListener('keydown', event => {
         enemy.move(event)
     });
