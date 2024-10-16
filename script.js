@@ -11,7 +11,7 @@ class Map{
         this.tile0.src = mapchip[0];
         this.tile1.src = mapchip[1];
         this.enemy_base = [0,0];
-        this.player_base = [2,4];
+        this.player_base = [4,2];
         console.log(this.enemy_base)
 
     }
@@ -28,6 +28,23 @@ class Map{
             }
         }
     }
+
+    judge_GAMEOVER(){
+        for(let emy of enemies){
+            
+            console.log(emy.x, emy.y);
+            this.dx_judge = Math.abs(emy.x - this.player_base[0]) < 1;
+            this.dy_judge = Math.abs(emy.y - this.player_base[1]) < 1;
+            
+            if(this.dx_judge && this.dy_judge){
+                console.log('enter')
+            }
+            
+        
+
+        }
+    }
+
 }
 
 class Turret{
@@ -126,10 +143,11 @@ function init(){
     window.addEventListener('keydown', event => {
         enemy.move(event)
     });
+    enemies.push(enemy)
 }
 
 function update(){
-    
+    map.judge_GAMEOVER();
 }
 
 function draw(){
