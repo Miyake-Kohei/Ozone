@@ -30,19 +30,19 @@ class Map{
     }
 
     judge_GAMEOVER(){
-        for(let emy of enemies){
-            
-            console.log(emy.x, emy.y);
+
+        for(let i = enemies.length - 1; i >= 0; i--) {
+            let emy = enemies[i];
             this.dx_judge = Math.abs(emy.x - this.player_base[0]) < 1;
             this.dy_judge = Math.abs(emy.y - this.player_base[1]) < 1;
-            
-            if(this.dx_judge && this.dy_judge){
-                console.log('enter')
-            }
-            
-        
 
+            if (this.dx_judge && this.dy_judge) {
+                console.log('enter')
+                enemies.splice(i, 1)
+                // ←emyオブジェクトを消すプログラムの予定
+            }
         }
+
     }
 
 }
