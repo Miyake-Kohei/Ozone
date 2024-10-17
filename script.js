@@ -13,7 +13,6 @@ class Map{
         this.enemy_base = [0,0];
         this.player_base = [2,4];
         console.log(this.enemy_base)
-
     }
 
     draw(){
@@ -31,14 +30,16 @@ class Map{
 }
 
 class Turret{
-    constructor(id,x,y){
+    constructor(id,x,y,turretchip){
         this.id = id;
         this.x = x;
         this.y = y;
+        this.pict = new Image();
+        this.pict.src = turretchip[this.id];
     }
 
     draw(){
-
+        graphic.drawImage(this.pict, this.pict.width*this.x, this.pict.height*this.y);
     }
 
     aim(){
@@ -105,11 +106,12 @@ function init(){
     CWidth = canvas.width;
     CHeight = canvas.height;
     const map_data = [
-        [0,1,0,0,0,0,0],
-        [0,1,0,1,1,1,0],
-        [0,1,0,1,0,1,0],
-        [0,1,0,1,0,1,0],
-        [0,0,0,1,0,0,0]
+        [0,1,0,0,0,1,0,0,0,1],
+        [0,1,0,1,0,1,0,1,0,1],
+        [0,1,0,1,0,1,0,1,0,1],
+        [0,1,0,1,0,1,0,1,0,1],
+        [0,0,0,1,0,1,0,1,0,1],
+        [0,0,0,1,0,0,0,1,0,1]
     ];
 
     const img_mapchip = [
@@ -120,12 +122,31 @@ function init(){
     const img_enemychip = [
         'img/enemy_temp.png'
     ];
+
+    const img_turretchip = [
+        'img/turret_temp.png'
+    ];
     
     map = new Map(map_data, img_mapchip);
-    enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    enemies.push(enemy);
+    addTurret(0,1,0,img_turretchip,1);
     window.addEventListener('keydown', event => {
         enemy.move(event)
     });
+}
+
+function addTurret(id,x,y,img_turretchip){
+    let turret = new Turret(id,x,y,img_turretchip);
+    turrets.push(turret);
+}
+
+function removeEnemy(){
+    enemies = enemies.filter((element) => element.isDead != true);
+}
+
+function drawUI(){
+
 }
 
 function update(){
@@ -134,7 +155,12 @@ function update(){
 
 function draw(){
     map.draw();
-    enemy.draw();    
+    for(let enemy of enemies){
+        enemy.draw();
+    }
+    for(let turret of turrets){
+        turret.draw();
+    }
 }
 
 function gameloop(){
