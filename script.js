@@ -56,22 +56,26 @@ class Turret{
 
 class Enemy{
     constructor(id,x,y,enemychip){
+        //敵を滑らかに動くようにする
+        //canvasにおける座標とgridにおける座標の両方を記述する
         this.id = id;
-        this.x = x; 
-        this.y = y;
+        this.x_grid = x; 
+        this.y_grid = y;
+        this.x_canvas = x_grid*map.vrble_width;
+        this.y_canvas = y_grid*map.vrble_height;
         this.pict = new Image();
         this.pict.src = enemychip[this.id];
-        console.log(this.x);
-        console.log(this.y);
+        //console.log(this.x);
+        //console.log(this.y);
     }
 
     draw(){
-        graphic.drawImage(this.pict, map.tile0.width*this.x, map.tile0.height*this.y);
+        graphic.drawImage(this.pict, this.x_canvas, this.y_canvas, this.vrble_width, this.vrble_height);
     }
 
     move(event){
-        let x_candidate = this.x;
-        let y_candidate = this.y;
+        let x_candidate = this.x_grid;
+        let y_candidate = this.y_grid;
         
 
         switch(event.key){
@@ -86,8 +90,12 @@ class Enemy{
         }
 
         if(map.map_data[y_candidate][x_candidate] === 0){
-            this.x = x_candidate;
-            this.y = y_candidate;
+            this.x_grid = x_candidate;
+            this.y_grid = y_candidate;
+            this.x_canvas = x_grid*map.vrble_width;
+            this.y_canvas = y_grid*map.vrble_height;
+            console.log(this.x_canvas);
+            console.log(this.y_canvas);
         }
     }
     attack(){
