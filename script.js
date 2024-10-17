@@ -14,19 +14,15 @@ class Map{
         this.player_base = [2,4];
         console.log(this.enemy_base)
 
-        this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
-        this.vrble_height = this.vrble_width
-        // this.vrble_height = graphic.canvas.height / Object.keys(this.map_data).length;
-
     }
 
     draw(){
         for (let y = 0; y < this.map_data.length; y++) {
             for (let x = 0; x < this.map_data[y].length; x++) {
                 if(this.map_data[y][x]===0){
-                    graphic.drawImage(this.tile0, this.vrble_width*x, this.vrble_height*y, this.vrble_width, this.vrble_height);
+                    graphic.drawImage(this.tile0, this.tile0.width*x, this.tile0.height*y);
                 }else{
-                    graphic.drawImage(this.tile1, this.vrble_width*x, this.vrble_height*y, this.vrble_width, this.vrble_height);
+                    graphic.drawImage(this.tile1, this.tile1.width*x, this.tile1.height*y);
                 }
 
             }
@@ -59,6 +55,7 @@ class Enemy{
         //敵を滑らかに動くようにする
         //canvasにおける座標とgridにおける座標の両方を記述する
         this.id = id;
+        this.isDead = false;
         this.count_move = 0;
         this.movement = ['D','D','D','D','R','R','U','U','U','U','R','R','R','R','D','D','D','D','L','L','U','U'];
         this.x_grid = x; 
@@ -69,8 +66,6 @@ class Enemy{
         this.flag_move = 0;
         this.pict = new Image();
         this.pict.src = enemychip[this.id];
-        //console.log(this.x);
-        //console.log(this.y);
     }
 
     draw(){
@@ -123,7 +118,6 @@ class Enemy{
     }
 
     attack(){
-        turre
     }
 }
 
@@ -141,11 +135,11 @@ function init(){
     CWidth = canvas.width;
     CHeight = canvas.height;
     const map_data = [
-        [0,1,0,0,0,0,0],
-        [0,1,0,1,1,1,0],
-        [0,1,0,1,0,1,0],
-        [0,1,0,1,0,1,0],
-        [0,0,0,1,0,0,0]
+        [0,1,0,0,0,1,0,0,0,1],
+        [0,1,0,1,0,1,0,1,0,1],
+        [0,1,0,1,0,1,0,1,0,1],
+        [0,1,0,1,0,1,0,1,0,1],
+        [0,0,0,1,0,0,0,1,0,1]
     ];
 
     const img_mapchip = [
@@ -161,13 +155,20 @@ function init(){
     enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
 }
 
+function removeEnemy(){
+    enemies = enemies.filter((element) => element.isDead != true);
+}
+
 function update(){
     enemy.move();
+    removeEnemy();
 }
 
 function draw(){
+    for(let enemy of enemies){
+        enemy.draw();
+    }
     map.draw();
-    enemy.draw();    
 }
 
 function gameloop(){
