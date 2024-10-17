@@ -11,7 +11,7 @@ class Map{
         this.tile0.src = mapchip[0];
         this.tile1.src = mapchip[1];
         this.enemy_base = [0,0];
-        this.player_base = [2,4];
+        this.player_base = [4,2];
         console.log(this.enemy_base)
 
     }
@@ -28,6 +28,23 @@ class Map{
             }
         }
     }
+
+    judge_GAMEOVER(){
+
+        for(let i = enemies.length - 1; i >= 0; i--) {
+            let emy = enemies[i];
+            this.dx_judge = Math.abs(emy.x - this.player_base[0]) < 1;
+            this.dy_judge = Math.abs(emy.y - this.player_base[1]) < 1;
+
+            if (this.dx_judge && this.dy_judge) {
+                console.log('enter')
+                enemies.splice(i, 1)
+                // ←emyオブジェクトを消すプログラムの予定
+            }
+        }
+
+    }
+
 }
 
 class Turret{
@@ -158,6 +175,7 @@ function init(){
 
 function removeEnemy(){
     enemies = enemies.filter((element) => element.isDead != true);
+    
 }
 
 function update(){
@@ -165,6 +183,7 @@ function update(){
         enemy.move();
     }
     removeEnemy();
+    map.judge_GAMEOVER();
 }
 
 function draw(){
