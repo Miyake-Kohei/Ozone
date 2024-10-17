@@ -55,6 +55,7 @@ class Enemy{
         //敵を滑らかに動くようにする
         //canvasにおける座標とgridにおける座標の両方を記述する
         this.id = id;
+        this.isDead = false;
         this.x_grid = x; 
         this.y_grid = y;
         this.x_canvas = this.x_grid*map.vrble_width;
@@ -63,8 +64,6 @@ class Enemy{
         this.flag_move = 0;
         this.pict = new Image();
         this.pict.src = enemychip[this.id];
-        //console.log(this.x);
-        //console.log(this.y);
     }
 
     draw(){
@@ -116,7 +115,6 @@ class Enemy{
     }
 
     attack(){
-        turre
     }
 }
 
@@ -134,11 +132,11 @@ function init(){
     CWidth = canvas.width;
     CHeight = canvas.height;
     const map_data = [
-        [0,1,0,0,0,0,0],
-        [0,1,0,1,1,1,0],
-        [0,1,0,1,0,1,0],
-        [0,1,0,1,0,1,0],
-        [0,0,0,1,0,0,0]
+        [0,1,0,0,0,1,0,0,0,1],
+        [0,1,0,1,0,1,0,1,0,1],
+        [0,1,0,1,0,1,0,1,0,1],
+        [0,1,0,1,0,1,0,1,0,1],
+        [0,0,0,1,0,0,0,1,0,1]
     ];
 
     const img_mapchip = [
@@ -151,19 +149,26 @@ function init(){
     ];
     
     map = new Map(map_data, img_mapchip);
-    enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    enemies.push(enemy);
     window.addEventListener('keydown', event => {
         enemy.move(event)
     });
 }
 
+function removeEnemy(){
+    enemies = enemies.filter((element) => element.isDead != true);
+}
+
 function update(){
-    
+    removeEnemy();
 }
 
 function draw(){
+    for(let enemy of enemies){
+        enemy.draw();
+    }
     map.draw();
-    enemy.draw();    
 }
 
 function gameloop(){
