@@ -11,7 +11,7 @@ class Map{
         this.tile0.src = mapchip[0];
         this.tile1.src = mapchip[1];
         this.enemy_base = [0,0];
-        this.player_base = [2,4];
+        this.player_base = [4,2];
         console.log(this.enemy_base)
     }
 
@@ -27,6 +27,23 @@ class Map{
             }
         }
     }
+
+    judge_GAMEOVER(){
+
+        for(let i = enemies.length - 1; i >= 0; i--) {
+            let emy = enemies[i];
+            this.dx_judge = Math.abs(emy.x - this.player_base[0]) < 1;
+            this.dy_judge = Math.abs(emy.y - this.player_base[1]) < 1;
+
+            if (this.dx_judge && this.dy_judge) {
+                console.log('enter')
+                enemies.splice(i, 1)
+                // ←emyオブジェクトを消すプログラムの予定
+            }
+        }
+
+    }
+
 }
 
 class Turret{
@@ -58,6 +75,8 @@ class Enemy{
         //canvasにおける座標とgridにおける座標の両方を記述する
         this.id = id;
         this.isDead = false;
+        this.count_move = 0;
+        this.movement = ['D','D','D','D','R','R','U','U','U','U','R','R','R','R','D','D','D','D','L','L','U','U'];
         this.x_grid = x; 
         this.y_grid = y;
         this.x_canvas = this.x_grid*map.vrble_width;
@@ -87,7 +106,7 @@ class Enemy{
         }, 16);
     }
 
-    move(event){
+    move(){
         if(this.flag_move === 1){
             console.log("break");
             return 0;
@@ -96,14 +115,14 @@ class Enemy{
         let y_candidate = this.y_grid;
         
 
-        switch(event.key){
-            case 'ArrowRight':x_candidate++;//右移動
+        switch(this.movement[this.count_move]){
+            case 'R' :x_candidate++;//右移動
                     break;
-            case 'ArrowLeft' :x_candidate--;//左移動
+            case 'L' :x_candidate--;//左移動
                     break;
-            case 'ArrowUp'   :y_candidate--;//上移動
+            case 'U' :y_candidate--;//上移動
                     break;
-            case 'ArrowDown' :y_candidate++;//下移動
+            case 'D' :y_candidate++;//下移動
                     break;
         }
 
@@ -113,6 +132,7 @@ class Enemy{
             this.y_grid = y_candidate;
             console.log(this.x_canvas);
             console.log(this.y_canvas);
+            this.count_move++;
         }
     }
 
@@ -184,7 +204,11 @@ function drawUI(){
 }
 
 function update(){
+    for(let enemy of enemies){
+        enemy.move();
+    }
     removeEnemy();
+    map.judge_GAMEOVER();
 }
 
 function draw(){
