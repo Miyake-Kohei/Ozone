@@ -61,8 +61,10 @@ class Enemy{
         this.id = id;
         this.x_grid = x; 
         this.y_grid = y;
-        this.x_canvas = x_grid*map.vrble_width;
-        this.y_canvas = y_grid*map.vrble_height;
+        this.x_canvas = this.x_grid*map.vrble_width;
+        this.y_canvas = this.y_grid*map.vrble_height;
+        this.frame_32 = map.vrble_width/32;
+        this.flag_move = 0;
         this.pict = new Image();
         this.pict.src = enemychip[this.id];
         //console.log(this.x);
@@ -70,10 +72,29 @@ class Enemy{
     }
 
     draw(){
-        graphic.drawImage(this.pict, this.x_canvas, this.y_canvas, this.vrble_width, this.vrble_height);
+        graphic.drawImage(this.pict, this.x_canvas, this.y_canvas, map.vrble_width, map.vrble_height);
+    }
+
+
+    animation_move(x_move,y_move){
+        let i=0;
+        this.flag_move = 1;
+        let interval = setInterval(() => {
+            this.x_canvas = this.x_canvas + x_move * this.frame_32;
+            this.y_canvas = this.y_canvas + y_move * this.frame_32;
+            i++;
+            if(i === 32){
+                this.flag_move = 0;
+                clearInterval(interval);
+            }
+        }, 16);
     }
 
     move(event){
+        if(this.flag_move === 1){
+            console.log("break");
+            return 0;
+        }
         let x_candidate = this.x_grid;
         let y_candidate = this.y_grid;
         
@@ -90,14 +111,14 @@ class Enemy{
         }
 
         if(map.map_data[y_candidate][x_candidate] === 0){
+            this.animation_move(x_candidate-this.x_grid,y_candidate-this.y_grid);
             this.x_grid = x_candidate;
             this.y_grid = y_candidate;
-            this.x_canvas = x_grid*map.vrble_width;
-            this.y_canvas = y_grid*map.vrble_height;
             console.log(this.x_canvas);
             console.log(this.y_canvas);
         }
     }
+
     attack(){
         turre
     }
