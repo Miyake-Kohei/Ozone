@@ -36,6 +36,7 @@ class Turret{
         this.y = y;
         this.pict = new Image();
         this.pict.src = turretchip[this.id];
+        this.bullets = [];
     }
 
     draw(){
@@ -88,7 +89,6 @@ class Enemy{
         }
     }
     attack(){
-        turre
     }
 }
 
@@ -99,6 +99,11 @@ onload = function(){
     //初期化
     init()
     //入力処理
+    document.onkeydown = keydown;
+    document.onclick = click;
+    document.onmousemove = mousemove;
+    document.onmouseover = mouseover;
+
     setInterval("gameloop()",16)
 }
 
@@ -110,7 +115,7 @@ function init(){
         [0,1,0,1,0,1,0,1,0,1],
         [0,1,0,1,0,1,0,1,0,1],
         [0,1,0,1,0,1,0,1,0,1],
-        [0,0,0,1,0,1,0,1,0,1],
+        [0,1,0,1,0,1,0,1,0,1],
         [0,0,0,1,0,0,0,1,0,1]
     ];
 
@@ -146,7 +151,8 @@ function removeEnemy(){
 }
 
 function drawUI(){
-
+    graphic.fillStyle = "rgb(0,0,0)";
+    graphic.fillRect(0,400,canvas.width,100);
 }
 
 function update(){
@@ -161,6 +167,23 @@ function draw(){
     for(let turret of turrets){
         turret.draw();
     }
+    drawUI();
+}
+
+function keydown(e){
+    
+}
+
+function click(e){
+
+}
+
+function mousemove(e){
+    
+}
+
+function mouseover(e){
+
 }
 
 function gameloop(){
