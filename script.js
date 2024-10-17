@@ -56,6 +56,8 @@ class Enemy{
         //canvasにおける座標とgridにおける座標の両方を記述する
         this.id = id;
         this.isDead = false;
+        this.count_move = 0;
+        this.movement = ['D','D','D','D','R','R','U','U','U','U','R','R','R','R','D','D','D','D','L','L','U','U'];
         this.x_grid = x; 
         this.y_grid = y;
         this.x_canvas = this.x_grid*map.vrble_width;
@@ -85,7 +87,7 @@ class Enemy{
         }, 16);
     }
 
-    move(event){
+    move(){
         if(this.flag_move === 1){
             console.log("break");
             return 0;
@@ -94,14 +96,14 @@ class Enemy{
         let y_candidate = this.y_grid;
         
 
-        switch(event.key){
-            case 'ArrowRight':x_candidate++;//右移動
+        switch(this.movement[this.count_move]){
+            case 'R' :x_candidate++;//右移動
                     break;
-            case 'ArrowLeft' :x_candidate--;//左移動
+            case 'L' :x_candidate--;//左移動
                     break;
-            case 'ArrowUp'   :y_candidate--;//上移動
+            case 'U' :y_candidate--;//上移動
                     break;
-            case 'ArrowDown' :y_candidate++;//下移動
+            case 'D' :y_candidate++;//下移動
                     break;
         }
 
@@ -111,6 +113,7 @@ class Enemy{
             this.y_grid = y_candidate;
             console.log(this.x_canvas);
             console.log(this.y_canvas);
+            this.count_move++;
         }
     }
 
@@ -151,9 +154,6 @@ function init(){
     map = new Map(map_data, img_mapchip);
     let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
     enemies.push(enemy);
-    window.addEventListener('keydown', event => {
-        enemy.move(event)
-    });
 }
 
 function removeEnemy(){
@@ -161,6 +161,9 @@ function removeEnemy(){
 }
 
 function update(){
+    for(let enemy of enemies){
+        enemy.move();
+    }
     removeEnemy();
 }
 
