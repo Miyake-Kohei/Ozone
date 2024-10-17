@@ -152,7 +152,8 @@ function init(){
     ];
     
     map = new Map(map_data, img_mapchip);
-    enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    enemies.push(enemy);
 }
 
 function removeEnemy(){
@@ -160,7 +161,9 @@ function removeEnemy(){
 }
 
 function update(){
-    enemy.move();
+    for(let enemy of enemies){
+        enemy.move();
+    }
     removeEnemy();
 }
 
