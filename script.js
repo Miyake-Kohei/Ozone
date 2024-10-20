@@ -11,8 +11,12 @@ class Map{
         this.tile0.src = mapchip[0];
         this.tile1.src = mapchip[1];
         this.enemy_base = [0,0];
-        this.player_base = [2,4];
+        this.player_base = [4,2];
         console.log(this.enemy_base)
+        this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
+        this.vrble_height = this.vrble_width
+        // this.vrble_height = graphic.canvas.height / Object.keys(this.map_data).length;
+
     }
 
     draw(){
@@ -27,6 +31,23 @@ class Map{
             }
         }
     }
+
+    judge_GAMEOVER(){
+
+        for(let i = enemies.length - 1; i >= 0; i--) {
+            let emy = enemies[i];
+            this.dx_judge = Math.abs(emy.x - this.player_base[0]) < 1;
+            this.dy_judge = Math.abs(emy.y - this.player_base[1]) < 1;
+
+            if (this.dx_judge && this.dy_judge) {
+                console.log('enter')
+                enemies.splice(i, 1)
+                // ←emyオブジェクトを消すプログラムの予定
+            }
+        }
+
+    }
+
 }
 
 class Turret{
@@ -50,39 +71,88 @@ class Turret{
 }
 
 class Enemy{
-    constructor(id,x,y,enemychip){
+    constructor(id,x,y,enemychip,speed){
         //敵を滑らかに動くようにする
         //canvasにおける座標とgridにおける座標の両方を記述する
         this.id = id;
         this.isDead = false;
-        this.count_move = 0;
-        this.movement = ['D','D','D','D','R','R','U','U','U','U','R','R','R','R','D','D','D','D','L','L','U','U'];
+        this.speed = speed;
         this.x_grid = x; 
         this.y_grid = y;
-        this.x_canvas = this.x_grid*map.tile0.width*x*1.0;
-        this.y_canvas = this.y_grid*map.tile0.width*x*1.0;
-        this.frame_32 = map.tile0.width/32.0;
-        console.log(map.tile0.width);
-        console.log(this.frame_32);
-        this.flag_move = 0;
+        this.x_canvas = this.x_grid*map.vrble_width;
+        this.y_canvas = this.y_grid*map.vrble_height;
+        this.frame = map.vrble_width/this.speed;
+        console.log(map.vrble_width)
+        console.log(this.frame)
+        this.flag_move = 0
         this.pict = new Image();
         this.pict.src = enemychip[this.id];
-        console.log(this.pict.width);
+        this.x_grid_before = null;
+        this.y_grid_before = null;
     }
 
     draw(){
-        graphic.drawImage(this.pict, this.x_canvas, this.y_canvas);
+        graphic.drawImage(this.pict, this.x_canvas, this.y_canvas, map.vrble_width, map.vrble_height);
     }
 
+    search_move(){
+        //右移動
+        try{
+            if(map.map_data[this.y_grid][this.x_grid+1] === 0){
+                if(this.y_grid != this.y_grid_before || this.x_grid+1 != this.x_grid_before){
+                    return 'R'
+                }
+            }
+        }
+        catch(e){
+            console.log(e.massage);
+        }
+
+        //左移動
+        try{
+            if(map.map_data[this.y_grid][this.x_grid-1] === 0){
+                if(this.y_grid != this.y_grid_before || this.x_grid-1 != this.x_grid_before){
+                    return 'L'
+                }
+            }
+        }
+        catch(e){
+            console.log(e.massage);
+        }
+
+        //上移動
+        try{
+            if(map.map_data[this.y_grid-1][this.x_grid] === 0){
+                if(this.y_grid-1 != this.y_grid_before || this.x_grid != this.x_grid_before){
+                    return 'U'
+                }
+            }
+        }
+        catch(e){
+            console.log(e.massage);
+        }
+
+        //下移動
+        try{
+            if(map.map_data[this.y_grid+1][this.x_grid] === 0){
+                if(this.y_grid+1 != this.y_grid_before || this.x_grid != this.x_grid_before){
+                    return 'D'
+                }
+            }
+        }
+        catch(e){
+            console.log(e.massage);
+        }
+    }
 
     animation_move(x_move,y_move){
         let i=0;
         this.flag_move = 1;
         let interval = setInterval(() => {
-            this.x_canvas = this.x_canvas + x_move * this.frame_32;
-            this.y_canvas = this.y_canvas + y_move * this.frame_32;
+            this.x_canvas = this.x_canvas + x_move * this.frame;
+            this.y_canvas = this.y_canvas + y_move * this.frame;
             i++;
-            if(i === 32){
+            if(i === this.speed){
                 this.flag_move = 0;
                 clearInterval(interval);
             }
@@ -96,9 +166,10 @@ class Enemy{
         }
         let x_candidate = this.x_grid;
         let y_candidate = this.y_grid;
-        
+        let command;
+        command = this.search_move();
 
-        switch(this.movement[this.count_move]){
+        switch(command){
             case 'R' :x_candidate++;//右移動
                     break;
             case 'L' :x_candidate--;//左移動
@@ -111,11 +182,12 @@ class Enemy{
 
         if(map.map_data[y_candidate][x_candidate] === 0){
             this.animation_move(x_candidate-this.x_grid,y_candidate-this.y_grid);
+            this.x_grid_before = this.x_grid;
+            this.y_grid_before = this.y_grid;
             this.x_grid = x_candidate;
             this.y_grid = y_candidate;
-            console.log(this.x_grid);
-            console.log(this.y_grid);
-            this.count_move++;
+            console.log(this.x_grid_before);
+            console.log(this.y_grid_before);
         }
     }
 
@@ -154,12 +226,13 @@ function init(){
     ];
     
     map = new Map(map_data, img_mapchip);
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,3); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
 }
 
 function removeEnemy(){
     enemies = enemies.filter((element) => element.isDead != true);
+    
 }
 
 function update(){
@@ -167,6 +240,7 @@ function update(){
         enemy.move();
     }
     removeEnemy();
+    map.judge_GAMEOVER();
 }
 
 function draw(){
