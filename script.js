@@ -2,6 +2,7 @@ let canvas,graphic,CWidth,CHeight;
 let enemies = [];
 let turrets = [];
 let map;
+let game_mode = 'in_title';
 
 class Map{
     constructor(map_data, mapchip){
@@ -237,7 +238,33 @@ function mouseover(e){
 
 }
 
+function drawText(ctx, text, x, y, size, color) {
+    ctx.font = `${size}px Arial`;
+    ctx.fillStyle = color;
+    ctx.textAlign = "center";
+    ctx.fillText(text, x, y);
+}
+
 function gameloop(){
-    update();
-    draw();
+    if( game_mode === 'in_title' ){
+        console.log('game_mode: in_title');
+        
+        drawText(graphic, "(Title)", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 60, "rgb(50, 50, 50)");
+        
+        window.addEventListener('keydown', event => {
+            if(event.code === 'Space'){
+                graphic.clearRect(0,0, CWidth, CHeight);
+                game_mode = 'in_game';
+                
+            }
+        });
+
+        
+    }
+
+    if( game_mode === 'in_game' ){
+        update();
+        draw();
+    }
 }
