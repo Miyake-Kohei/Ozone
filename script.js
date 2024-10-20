@@ -13,7 +13,6 @@ class Map{
         this.enemy_base = [0,0];
         this.player_base = [2,4];
         console.log(this.enemy_base)
-
     }
 
     draw(){
@@ -60,16 +59,19 @@ class Enemy{
         this.movement = ['D','D','D','D','R','R','U','U','U','U','R','R','R','R','D','D','D','D','L','L','U','U'];
         this.x_grid = x; 
         this.y_grid = y;
-        this.x_canvas = this.x_grid*map.vrble_width;
-        this.y_canvas = this.y_grid*map.vrble_height;
-        this.frame_32 = map.vrble_width/32;
+        this.x_canvas = this.x_grid*map.tile0.width*x*1.0;
+        this.y_canvas = this.y_grid*map.tile0.width*x*1.0;
+        this.frame_32 = map.tile0.width/32.0;
+        console.log(map.tile0.width);
+        console.log(this.frame_32);
         this.flag_move = 0;
         this.pict = new Image();
         this.pict.src = enemychip[this.id];
+        console.log(this.pict.width);
     }
 
     draw(){
-        graphic.drawImage(this.pict, this.x_canvas, this.y_canvas, map.vrble_width, map.vrble_height);
+        graphic.drawImage(this.pict, this.x_canvas, this.y_canvas);
     }
 
 
@@ -111,8 +113,8 @@ class Enemy{
             this.animation_move(x_candidate-this.x_grid,y_candidate-this.y_grid);
             this.x_grid = x_candidate;
             this.y_grid = y_candidate;
-            console.log(this.x_canvas);
-            console.log(this.y_canvas);
+            console.log(this.x_grid);
+            console.log(this.y_grid);
             this.count_move++;
         }
     }
@@ -168,10 +170,10 @@ function update(){
 }
 
 function draw(){
+    map.draw();
     for(let enemy of enemies){
         enemy.draw();
     }
-    map.draw();
 }
 
 function gameloop(){
