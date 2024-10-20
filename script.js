@@ -12,7 +12,6 @@ class Map{
         this.tile1.src = mapchip[1];
         this.enemy_base = [0,0];
         this.player_base = [4,2];
-        console.log(this.enemy_base)
     }
 
     draw(){
@@ -29,16 +28,16 @@ class Map{
     }
 
     judge_GAMEOVER(){
-
-        for(let i = enemies.length - 1; i >= 0; i--) {
+        for(let i = 0; i < enemies.length; i++) {
             let emy = enemies[i];
-            this.dx_judge = Math.abs(emy.x - this.player_base[0]) < 1;
-            this.dy_judge = Math.abs(emy.y - this.player_base[1]) < 1;
+            this.dx_judge = Math.abs(emy.x_grid - this.player_base[0]) < 1;
+            this.dy_judge = Math.abs(emy.y_grid - this.player_base[1]) < 1;
 
             if (this.dx_judge && this.dy_judge) {
-                console.log('enter')
-                enemies.splice(i, 1)
-                // ←emyオブジェクトを消すプログラムの予定
+                _before_enemies = enemies;
+                emy.isDead = true;
+                removeEnemy();
+                console.log('removeEnemy: ', _before_enemies, '→', enemies);
             }
         }
 
