@@ -1,6 +1,7 @@
 let canvas,graphic,CWidth,CHeight;
 let enemies = [];
 let turrets = [];
+let game_mode = 'in_title';
 let map,player;
 let pointer = {
     "x":0,
@@ -75,7 +76,6 @@ class Map{
         this.tile1.src = mapchip[1];
         this.enemy_base = [0,0];
         this.player_base = [4,2];
-        console.log(this.enemy_base)
         this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
         this.vrble_height = this.vrble_width
         // this.vrble_height = graphic.canvas.height / Object.keys(this.map_data).length;
@@ -96,15 +96,16 @@ class Map{
     }
 
     judge_GAMEOVER(){
-
-        for(let i = enemies.length - 1; i >= 0; i--) {
+        for(let i = 0; i < enemies.length; i++) {
             let emy = enemies[i];
-            this.dx_judge = Math.abs(emy.x - this.player_base[0]) < 1;
-            this.dy_judge = Math.abs(emy.y - this.player_base[1]) < 1;
+            this.dx_judge = Math.abs(emy.x_grid - this.player_base[0]) < 1;
+            this.dy_judge = Math.abs(emy.y_grid - this.player_base[1]) < 1;
 
             if (this.dx_judge && this.dy_judge) {
-                enemies.splice(i, 1)
-                // ←emyオブジェクトを消すプログラムの予定
+                _before_enemies = enemies;
+                emy.isDead = true;
+                removeEnemy();
+                console.log('removeEnemy: ', _before_enemies, '→', enemies);
             }
         }
 
@@ -362,7 +363,33 @@ function mouseover(e){
 
 }
 
+function drawText(ctx, text, x, y, size, color) {
+    ctx.font = `${size}px Arial`;
+    ctx.fillStyle = color;
+    ctx.textAlign = "center";
+    ctx.fillText(text, x, y);
+}
+
 function gameloop(){
-    update();
-    draw();
+    if( game_mode === 'in_title' ){
+        console.log('game_mode: in_title');
+        
+        drawText(graphic, "(Title)", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 60, "rgb(50, 50, 50)");
+        
+        window.addEventListener('keydown', event => {
+            if(event.code === 'Space'){
+                graphic.clearRect(0,0, CWidth, CHeight);
+                game_mode = 'in_game';
+                
+            }
+        });
+
+        
+    }
+
+    if( game_mode === 'in_game' ){
+        update();
+        draw();
+    }
 }
