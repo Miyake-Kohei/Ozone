@@ -25,9 +25,9 @@ class Player{
 
         if(this.y>displayY&&this.y<displayY+this.pict.height){
             let gridX = Math.floor(this.x/this.pict.width);
-            if(gridX%2!=0&&gridX+1>=this.picts.length){
+            if(gridX%2!=0&&Math.floor(gridX/2)<this.picts.length){
                 this.hold = true;
-                this.holdID = gridX%2;
+                this.holdID = Math.floor(gridX/2);
             }
             else{
                 this.hold = false;
