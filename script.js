@@ -75,7 +75,7 @@ class Map{
         this.tile0.src = mapchip[0];
         this.tile1.src = mapchip[1];
         this.enemy_base = [0,0];
-        this.player_base = [4,2];
+        this.player_base = [8,4];
         this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
         this.vrble_height = this.vrble_width
         // this.vrble_height = graphic.canvas.height / Object.keys(this.map_data).length;
@@ -102,10 +102,10 @@ class Map{
             this.dy_judge = Math.abs(emy.y_grid - this.player_base[1]) < 1;
 
             if (this.dx_judge && this.dy_judge) {
-                _before_enemies = enemies;
+                //_before_enemies = enemies;
                 emy.isDead = true;
                 removeEnemy();
-                console.log('removeEnemy: ', _before_enemies, '→', enemies);
+                //console.log('removeEnemy: ', _before_enemies, '→', enemies);
             }
         }
 
@@ -208,7 +208,7 @@ class Enemy{
         }
     }
 
-    animation_move(x_move,y_move){
+    animation_move(x_move,y_move,x_candidate,y_candidate){
         let i=0;
         this.flag_move = 1;
         let interval = setInterval(() => {
@@ -217,6 +217,8 @@ class Enemy{
             i++;
             if(i === this.speed){
                 this.flag_move = 0;
+                this.x_grid = x_candidate;
+                this.y_grid = y_candidate;
                 clearInterval(interval);
             }
         }, 16);
@@ -243,13 +245,13 @@ class Enemy{
         }
 
         if(map.map_data[y_candidate][x_candidate] === 0){
-            this.animation_move(x_candidate-this.x_grid,y_candidate-this.y_grid);
+            this.animation_move(x_candidate-this.x_grid,y_candidate-this.y_grid,x_candidate,y_candidate);
             this.x_grid_before = this.x_grid;
             this.y_grid_before = this.y_grid;
-            this.x_grid = x_candidate;
-            this.y_grid = y_candidate;
-            console.log(this.x_grid_before);
-            console.log(this.y_grid_before);
+            //this.x_grid = x_candidate;
+            //this.y_grid = y_candidate;
+            //console.log(this.x_grid_before);
+            //console.log(this.y_grid_before);
         }
     }
 
@@ -300,7 +302,7 @@ function init(){
 
     map = new Map(map_data, img_mapchip);
     player = new Player(img_turretchip);
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,100); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,10); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
     addTurret(0,1,0);
 }
