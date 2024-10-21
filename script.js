@@ -208,7 +208,7 @@ class Enemy{
         }
     }
 
-    animation_move(x_move,y_move){
+    animation_move(x_move,y_move,x_candidate,y_candidate){
         let i=0;
         this.flag_move = 1;
         let interval = setInterval(() => {
@@ -217,6 +217,8 @@ class Enemy{
             i++;
             if(i === this.speed){
                 this.flag_move = 0;
+                this.x_grid = x_candidate;
+                this.y_grid = y_candidate;
                 clearInterval(interval);
             }
         }, 16);
@@ -243,11 +245,11 @@ class Enemy{
         }
 
         if(map.map_data[y_candidate][x_candidate] === 0){
-            this.animation_move(x_candidate-this.x_grid,y_candidate-this.y_grid);
+            this.animation_move(x_candidate-this.x_grid,y_candidate-this.y_grid,x_candidate,y_candidate);
             this.x_grid_before = this.x_grid;
             this.y_grid_before = this.y_grid;
-            this.x_grid = x_candidate;
-            this.y_grid = y_candidate;
+            //this.x_grid = x_candidate;
+            //this.y_grid = y_candidate;
             //console.log(this.x_grid_before);
             //console.log(this.y_grid_before);
         }
