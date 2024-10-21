@@ -226,7 +226,7 @@ function init(){
     ];
     
     map = new Map(map_data, img_mapchip);
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,40); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,100); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
 }
 
