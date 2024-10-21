@@ -83,7 +83,7 @@ class Map{
         this.tile0.src = mapchip[0];
         this.tile1.src = mapchip[1];
         this.enemy_base = [0,0];
-        this.player_base = [4,2];
+        this.player_base = [8,6];
         console.log(this.enemy_base)
         this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
         this.vrble_height = this.vrble_width
