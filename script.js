@@ -61,8 +61,17 @@ class Player{
         }
     }
 
-    deploy(){
-
+    deploy(map){
+        if(this.x>0&&this.x<canvas.width&&this.y>0&&this.y<64*6){
+            let gridc = {
+                "x": Math.floor(this.x/map.tile0.width),
+                "y": Math.floor(this.y/map.tile0.height)
+            }
+            if(map.map_data[gridc.y][gridc.x]==1){
+                map.map_data[gridc.y][gridc.x]=2;
+                addTurret(this.holdID,gridc.x,gridc.y);
+            }
+        }
     }
 }
 
@@ -113,14 +122,17 @@ class Map{
 }
 
 class Turret{
-    constructor(id,x,y){
+    constructor(id,x,y,turretchip){
         this.id = id;
         this.x = x;
         this.y = y;
+        this.pict = new Image();
+        this.pict.src = turretchip[this.id];
+        this.bullets = [];
     }
 
     draw(){
-
+        graphic.drawImage(this.pict, this.pict.width*this.x, this.pict.height*this.y);
     }
 
     aim(){
@@ -144,8 +156,6 @@ class Enemy{
         this.x_canvas = this.x_grid*map.vrble_width;
         this.y_canvas = this.y_grid*map.vrble_height;
         this.frame = map.vrble_width/this.speed;
-        console.log(map.vrble_width)
-        console.log(this.frame)
         this.flag_move = 0
         this.pict = new Image();
         this.pict.src = enemychip[this.id];
@@ -280,7 +290,8 @@ function init(){
         [0,1,0,1,0,1,0,1,0,1],
         [0,1,0,1,0,1,0,1,0,1],
         [0,1,0,1,0,1,0,1,0,1],
-        [0,0,0,1,0,0,0,1,0,1]
+        [0,1,0,1,0,1,0,1,0,1],
+        [0,0,0,1,0,0,0,1,0,1],
     ];
 
     const img_mapchip = [
@@ -349,6 +360,7 @@ function mousedown(e){
 
 function mouseup(e){
     if(player.hold){
+        player.deploy(map);
         player.hold = false;
     }
 }
