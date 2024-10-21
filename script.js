@@ -1,8 +1,71 @@
 let canvas,graphic,CWidth,CHeight;
 let enemies = [];
 let turrets = [];
-let map;
 let game_mode = 'in_title';
+let map,player;
+let pointer = {
+    "x":0,
+    "y":0
+}
+
+class Player{
+    constructor(turretchip){
+        this.x = pointer.x;
+        this.y = pointer.y;
+        this.hold = false;
+        this.holdID = 0;
+        this.picts = turretchip;
+        this.pict = new Image();
+        this.pict.src = turretchip[this.holdID];
+    }
+
+    grab(){
+
+        const displayX = 60;
+        const displayY = 420;
+
+        if(this.y>displayY&&this.y<displayY+this.pict.height){
+            let gridX = Math.floor(this.x/this.pict.width);
+            if(gridX%2!=0&&Math.floor(gridX/2)<this.picts.length){
+                this.hold = true;
+                this.holdID = Math.floor(gridX/2);
+            }
+            else{
+                this.hold = false;
+            }
+        }
+    }
+
+    draw(){
+        this.x = pointer.x;
+        this.y = pointer.y;
+        if(this.hold){
+            this.pict.src = this.picts[this.holdID]
+            graphic.drawImage(this.pict, this.x-this.pict.width/2, this.y-this.pict.height/2);
+        }
+    }
+
+    drawUI(){
+        const displayX = 60;
+        const displayY = 420;
+
+        graphic.fillStyle = "rgb(0,0,0)";
+        graphic.fillRect(0,400,canvas.width,100);
+
+        let i=0
+        for(let pict of this.picts){
+            let portrait = new Image();
+            portrait.src = pict;
+        
+            graphic.drawImage(portrait, portrait.width*(2*i+1), displayY); 
+            i++;       
+        }
+    }
+
+    deploy(){
+
+    }
+}
 
 class Map{
     constructor(map_data, mapchip){
@@ -13,6 +76,10 @@ class Map{
         this.tile1.src = mapchip[1];
         this.enemy_base = [0,0];
         this.player_base = [4,2];
+        this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
+        this.vrble_height = this.vrble_width
+        // this.vrble_height = graphic.canvas.height / Object.keys(this.map_data).length;
+
     }
 
     draw(){
@@ -47,17 +114,14 @@ class Map{
 }
 
 class Turret{
-    constructor(id,x,y,turretchip){
+    constructor(id,x,y){
         this.id = id;
         this.x = x;
         this.y = y;
-        this.pict = new Image();
-        this.pict.src = turretchip[this.id];
-        this.bullets = [];
     }
 
     draw(){
-        graphic.drawImage(this.pict, this.pict.width*this.x, this.pict.height*this.y);
+
     }
 
     aim(){
@@ -70,36 +134,88 @@ class Turret{
 }
 
 class Enemy{
-    constructor(id,x,y,enemychip){
+    constructor(id,x,y,enemychip,speed){
         //敵を滑らかに動くようにする
         //canvasにおける座標とgridにおける座標の両方を記述する
         this.id = id;
         this.isDead = false;
-        this.count_move = 0;
-        this.movement = ['D','D','D','D','R','R','U','U','U','U','R','R','R','R','D','D','D','D','L','L','U','U'];
+        this.speed = speed;
         this.x_grid = x; 
         this.y_grid = y;
         this.x_canvas = this.x_grid*map.vrble_width;
         this.y_canvas = this.y_grid*map.vrble_height;
-        this.frame_32 = map.vrble_width/32;
-        this.flag_move = 0;
+        this.frame = map.vrble_width/this.speed;
+        console.log(map.vrble_width)
+        console.log(this.frame)
+        this.flag_move = 0
         this.pict = new Image();
         this.pict.src = enemychip[this.id];
+        this.x_grid_before = null;
+        this.y_grid_before = null;
     }
 
     draw(){
         graphic.drawImage(this.pict, this.x_canvas, this.y_canvas, map.vrble_width, map.vrble_height);
     }
 
+    search_move(){
+        //右移動
+        try{
+            if(map.map_data[this.y_grid][this.x_grid+1] === 0){
+                if(this.y_grid != this.y_grid_before || this.x_grid+1 != this.x_grid_before){
+                    return 'R'
+                }
+            }
+        }
+        catch(e){
+            console.log(e.massage);
+        }
+
+        //左移動
+        try{
+            if(map.map_data[this.y_grid][this.x_grid-1] === 0){
+                if(this.y_grid != this.y_grid_before || this.x_grid-1 != this.x_grid_before){
+                    return 'L'
+                }
+            }
+        }
+        catch(e){
+            console.log(e.massage);
+        }
+
+        //上移動
+        try{
+            if(map.map_data[this.y_grid-1][this.x_grid] === 0){
+                if(this.y_grid-1 != this.y_grid_before || this.x_grid != this.x_grid_before){
+                    return 'U'
+                }
+            }
+        }
+        catch(e){
+            console.log(e.massage);
+        }
+
+        //下移動
+        try{
+            if(map.map_data[this.y_grid+1][this.x_grid] === 0){
+                if(this.y_grid+1 != this.y_grid_before || this.x_grid != this.x_grid_before){
+                    return 'D'
+                }
+            }
+        }
+        catch(e){
+            console.log(e.massage);
+        }
+    }
 
     animation_move(x_move,y_move){
         let i=0;
         this.flag_move = 1;
         let interval = setInterval(() => {
-            this.x_canvas = this.x_canvas + x_move * this.frame_32;
-            this.y_canvas = this.y_canvas + y_move * this.frame_32;
+            this.x_canvas = this.x_canvas + x_move * this.frame;
+            this.y_canvas = this.y_canvas + y_move * this.frame;
             i++;
-            if(i === 32){
+            if(i === this.speed){
                 this.flag_move = 0;
                 clearInterval(interval);
             }
@@ -108,14 +224,14 @@ class Enemy{
 
     move(){
         if(this.flag_move === 1){
-            console.log("break");
             return 0;
         }
         let x_candidate = this.x_grid;
         let y_candidate = this.y_grid;
-        
+        let command;
+        command = this.search_move();
 
-        switch(this.movement[this.count_move]){
+        switch(command){
             case 'R' :x_candidate++;//右移動
                     break;
             case 'L' :x_candidate--;//左移動
@@ -128,11 +244,12 @@ class Enemy{
 
         if(map.map_data[y_candidate][x_candidate] === 0){
             this.animation_move(x_candidate-this.x_grid,y_candidate-this.y_grid);
+            this.x_grid_before = this.x_grid;
+            this.y_grid_before = this.y_grid;
             this.x_grid = x_candidate;
             this.y_grid = y_candidate;
-            console.log(this.x_canvas);
-            console.log(this.y_canvas);
-            this.count_move++;
+            console.log(this.x_grid_before);
+            console.log(this.y_grid_before);
         }
     }
 
@@ -148,9 +265,10 @@ onload = function(){
     init()
     //入力処理
     document.onkeydown = keydown;
-    document.onclick = click;
     document.onmousemove = mousemove;
     document.onmouseover = mouseover;
+    document.onmousedown = mousedown;
+    document.onmouseup = mouseup;
 
     setInterval("gameloop()",16)
 }
@@ -160,7 +278,6 @@ function init(){
     CHeight = canvas.height;
     const map_data = [
         [0,1,0,0,0,1,0,0,0,1],
-        [0,1,0,1,0,1,0,1,0,1],
         [0,1,0,1,0,1,0,1,0,1],
         [0,1,0,1,0,1,0,1,0,1],
         [0,1,0,1,0,1,0,1,0,1],
@@ -175,32 +292,30 @@ function init(){
     const img_enemychip = [
         'img/enemy_temp.png'
     ];
-
-    const img_turretchip = [
-        'img/turret_temp.png'
-    ];
     
+    const img_turretchip = [
+        'img/turret_temp1.png',
+        'img/turret_temp2.png'
+    ]
+
     map = new Map(map_data, img_mapchip);
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip);
+    player = new Player(img_turretchip);
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,100); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
-    addTurret(0,1,0,img_turretchip,1);
-    window.addEventListener('keydown', event => {
-        enemy.move(event)
-    });
+    addTurret(0,1,0);
 }
 
-function addTurret(id,x,y,img_turretchip){
+function addTurret(id,x,y){
+    const img_turretchip = [
+        'img/turret_temp1.png',
+        'img/turret_temp2.png'
+    ];
     let turret = new Turret(id,x,y,img_turretchip);
     turrets.push(turret);
 }
 
 function removeEnemy(){
     enemies = enemies.filter((element) => element.isDead != true);
-}
-
-function drawUI(){
-    graphic.fillStyle = "rgb(0,0,0)";
-    graphic.fillRect(0,400,canvas.width,100);
 }
 
 function update(){
@@ -212,6 +327,8 @@ function update(){
 }
 
 function draw(){
+    graphic.fillStyle = "rgb(255,255,255)";
+    graphic.fillRect(0,0,canvas.width,canvas.height);
     map.draw();
     for(let enemy of enemies){
         enemy.draw();
@@ -219,19 +336,27 @@ function draw(){
     for(let turret of turrets){
         turret.draw();
     }
-    drawUI();
+    player.drawUI();
+    player.draw();
 }
 
 function keydown(e){
-    
+
 }
 
-function click(e){
+function mousedown(e){
+    player.grab();
+}
 
+function mouseup(e){
+    if(player.hold){
+        player.hold = false;
+    }
 }
 
 function mousemove(e){
-    
+    pointer.x = e.offsetX;
+    pointer.y = e.offsetY;
 }
 
 function mouseover(e){
