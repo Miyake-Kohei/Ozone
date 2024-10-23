@@ -1,6 +1,7 @@
 let canvas,graphic,CWidth,CHeight;
 let enemies = [];
 let turrets = [];
+let bullets = [];
 let game_mode = 'in_title';
 let map,player;
 let pointer = {
@@ -70,7 +71,7 @@ class Player{
             }
             if(map.map_data[gridc.y][gridc.x]==1){
                 map.map_data[gridc.y][gridc.x]=2;
-                addTurret(this.holdID,gridc.x,gridc.y);
+                addTurret(this.holdID,gridc.x,gridc.y,3);
             }
         }
     }
@@ -122,14 +123,52 @@ class Map{
 
 }
 
-class Turret{
-    constructor(id,x,y,turretchip){
-        this.id = id;
+class Bullet{
+    constructor(x,y,vx,vy,pict){
         this.x = x;
         this.y = y;
         this.pict = new Image();
+        this.pict.src = pict;
+        this.vx = vx;
+        this.vy = vy;
+        this.damage = 10;
+        this.away = false;
+    }
+
+    draw(){
+        graphic.drawImage(this.pict,this.x-this.pict.width/2,this.y-this.pict.height/2);    
+    }
+
+    fly(){
+        this.x += this.vx;
+        this.y += this.vy;
+        if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height){
+            this.away = true;
+        }
+    }
+
+    hit(enemies){
+        for(let enemy of enemies){
+            const dx = enemy.x - (this.x+1/2)*this.pict.width;
+            const dy = enemy.y - (this.y+1/2)*this.pict.height;
+            const dis = Math.sqrt(dx*dx+dy*dy);
+            if(dis<enemy.pict.width){
+                enemy.hp -= this.damage;
+                this.away = true;
+                console.log("hit");
+            }
+        }
+    }
+}
+
+class Turret{
+    constructor(id,x,y,bulletSpeed,turretchip){
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.bulletSpeed = bulletSpeed;
+        this.pict = new Image();
         this.pict.src = turretchip[this.id];
-        this.bullets = [];
     }
 
     draw(){
@@ -140,8 +179,14 @@ class Turret{
 
     }
 
-    shoot(){
-
+    shoot(target){
+        const dx = target.x - (this.x+1/2)*this.pict.width;
+        const dy = target.y - (this.y+1/2)*this.pict.height;
+        const dis = Math.sqrt(dx*dx+dy*dy);
+        const vx = (dx/dis)*this.bulletSpeed;
+        const vy = (dy/dis)*this.bulletSpeed;
+        let bullet = new Bullet((this.x+1/2)*this.pict.width,(this.y+1/2)*this.pict.height,vx,vy,"img/testbullet.png");
+        bullets.push(bullet);
     }
 }
 
@@ -315,15 +360,14 @@ function init(){
     player = new Player(img_turretchip);
     let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,10); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
-    addTurret(0,1,0);
 }
 
-function addTurret(id,x,y){
+function addTurret(id,x,y,speed){
     const img_turretchip = [
         'img/turret_temp1.png',
         'img/turret_temp2.png'
     ];
-    let turret = new Turret(id,x,y,img_turretchip);
+    let turret = new Turret(id,x,y,speed,img_turretchip);
     turrets.push(turret);
 }
 
@@ -331,11 +375,23 @@ function removeEnemy(){
     enemies = enemies.filter((element) => element.isDead != true);
 }
 
+function removeBullet(){
+    bullets = bullets.filter((element) => element.away != true);
+}
+
 function update(){
     for(let enemy of enemies){
         enemy.move();
     }
     removeEnemy();
+    for(let turret of turrets){
+        turret.shoot(pointer);
+    }
+    for(let bullet of bullets){
+        bullet.fly();
+        bullet.hit(enemies);
+    }
+    removeBullet();
     map.judge_GAMEOVER();
 }
 
@@ -348,6 +404,9 @@ function draw(){
     }
     for(let turret of turrets){
         turret.draw();
+    }
+    for(let bullet of bullets){
+        bullet.draw();
     }
     player.drawUI();
     player.draw();
