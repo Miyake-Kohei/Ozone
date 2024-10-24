@@ -420,7 +420,6 @@ function gameloop(){
             if(event.code === 'Space'){
                 graphic.clearRect(0,0, CWidth, CHeight);
                 game_mode = 'in_game';
-                
             }
         });
     }
