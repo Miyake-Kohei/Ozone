@@ -14,12 +14,12 @@ let wave_count = 0;
 let wave_mode = 'calm';
 let wave_contents = [
     [
-        { type: 'enemyType1', move_interval: 10, spawnSec: 1 },
-        { type: 'enemyType1', move_interval: 15, spawnSec: 2 },
-        { type: 'enemyType1', move_interval: 23, spawnSec: 4 },
-        { type: 'enemyType1', move_interval: 33, spawnSec: 4 },
-        { type: 'enemyType1', move_interval: 13, spawnSec: 6 },
-        { type: 'enemyType1', move_interval: 19, spawnSec: 9 },
+        { type: 'enemyType1', move_interval: 60, spawnSec: 1 },
+        { type: 'enemyType1', move_interval: 60, spawnSec: 2 },
+        { type: 'enemyType1', move_interval: 60, spawnSec: 4 },
+        { type: 'enemyType1', move_interval: 63, spawnSec: 4 },
+        { type: 'enemyType1', move_interval: 60, spawnSec: 6 },
+        { type: 'enemyType1', move_interval: 60, spawnSec: 9 },
     ]
 ];
 
@@ -88,7 +88,7 @@ class Player{
             const COST = 1;
             if(map.map_data[gridc.y][gridc.x]==1 && this.resource >= COST){
                 map.map_data[gridc.y][gridc.x]=2;
-                addTurret(this.holdID,gridc.x,gridc.y,3);
+                addTurret(this.holdID,gridc.x,gridc.y,6);
                 this.resource -= COST;
                 console.log(this.resource, 'resource left')
             }
