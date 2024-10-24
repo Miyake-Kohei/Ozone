@@ -7,6 +7,20 @@ let pointer = {
     "x":0,
     "y":0
 }
+// let current_wave = 0;
+// let wave_contents = [
+//     {   
+//         wave_number: 1,
+//         enemies: [
+//             { type:'enemyType1', spawnTime:1 },
+//             { type:'enemyType1', spawnTime:1 },
+//             { type:'enemyType1', spawnTime:1 },
+//             { type:'enemyType1', spawnTime:1 },
+//             { type:'enemyType1', spawnTime:1 },
+//             { type:'enemyType1', spawnTime:1 },
+//         ]
+//     }
+// ];
 
 class Player{
     constructor(turretchip){
@@ -332,6 +346,12 @@ function addTurret(id,x,y){
     turrets.push(turret);
 }
 
+function addEnemy(_move_interval){
+    const img_enemychip = ['img/enemy_temp.png'];
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _move_interval); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    enemies.push(enemy);
+}
+
 function removeEnemy(){
     enemies = enemies.filter((element) => element.isDead != true);
 }
@@ -403,8 +423,6 @@ function gameloop(){
                 
             }
         });
-
-        
     }
 
     if( game_mode === 'in_game' ){
