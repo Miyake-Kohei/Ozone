@@ -168,10 +168,10 @@ class Bullet{
 
     hit(enemies){
         for(let enemy of enemies){
-            const dx = enemy.x_canvas - (this.x+ (1/2 * this.pict.width));
-            const dy = enemy.y_canvas - (this.y+ (1/2 * this.pict.height));
+            const dx = (enemy.x_canvas + enemy.pict.width/2) - (this.x + this.pict.width/2);
+            const dy = (enemy.y_canvas + enemy.pict.height/2) - (this.y + this.pict.height/2);
             const dis = Math.sqrt(dx*dx+dy*dy);
-            if(dis<enemy.pict.width){
+            if(dis<enemy.pict.width/2){
                 enemy.hp -= this.damage;
                 this.away = true;
                 console.log("hit");
