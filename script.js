@@ -205,13 +205,13 @@ class Turret{
                 target = enemy;
             }
         }
-        console.log(min);
-        console.log(target);
+        //console.log(min);
+        //console.log(target);
         try{
             shoot(target);
         }
         catch(e){
-            console.log(e.massage);
+
         }
     }
 
