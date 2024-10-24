@@ -216,8 +216,8 @@ class Turret{
     }
 
     shoot(target){
-        const dx = target.x - (this.x+1/2)*this.pict.width;
-        const dy = target.y - (this.y+1/2)*this.pict.height;
+        const dx = target.x_canvas - (this.x+1/2)*this.pict.width;
+        const dy = target.y_canvas - (this.y+1/2)*this.pict.height;
         const dis = Math.sqrt(dx*dx+dy*dy);
         const vx = (dx/dis)*this.bulletSpeed;
         const vy = (dy/dis)*this.bulletSpeed;
@@ -436,9 +436,6 @@ function update(){
         enemy.dead();
     }
     removeEnemy();
-    for(let turret of turrets){
-        turret.shoot(pointer);
-    }
     for(let bullet of bullets){
         bullet.fly();
         bullet.hit(enemies);
