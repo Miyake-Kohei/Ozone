@@ -149,6 +149,12 @@ class Turret{
         }
         console.log(min);
         console.log(target);
+        try{
+            enemies[target].hp--;
+        }
+        catch(e){
+            console.log(e.massage);
+        }
     }
 
     shoot(){
@@ -157,7 +163,7 @@ class Turret{
 }
 
 class Enemy{
-    constructor(id,x,y,enemychip,speed){
+    constructor(id,x,y,enemychip,speed,HP){
         //敵を滑らかに動くようにする
         //canvasにおける座標とgridにおける座標の両方を記述する
         this.id = id;
@@ -173,6 +179,7 @@ class Enemy{
         this.pict.src = enemychip[this.id];
         this.x_grid_before = null;
         this.y_grid_before = null;
+        this.hp = HP;
     }
 
     draw(){
@@ -280,6 +287,12 @@ class Enemy{
 
     attack(){
     }
+
+    dead(){
+        if(this.hp <= 0){
+            this.isDead = true;
+        }
+    }
 }
 
 onload = function(){
@@ -326,7 +339,7 @@ function init(){
 
     map = new Map(map_data, img_mapchip);
     player = new Player(img_turretchip);
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,1001); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,1001,500); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
     addTurret(0,1,0);
 }
@@ -347,6 +360,7 @@ function removeEnemy(){
 function update(){
     for(let enemy of enemies){
         enemy.move();
+        enemy.dead();
     }
     removeEnemy();
     map.judge_GAMEOVER();
