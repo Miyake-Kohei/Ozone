@@ -149,8 +149,8 @@ class Bullet{
 
     hit(enemies){
         for(let enemy of enemies){
-            const dx = enemy.x - (this.x+1/2)*this.pict.width;
-            const dy = enemy.y - (this.y+1/2)*this.pict.height;
+            const dx = enemy.x_canvas - (this.x+1/2)*this.pict.width;
+            const dy = enemy.y_canvas - (this.y+1/2)*this.pict.height;
             const dis = Math.sqrt(dx*dx+dy*dy);
             if(dis<enemy.pict.width){
                 enemy.hp -= this.damage;
@@ -358,7 +358,7 @@ function init(){
 
     map = new Map(map_data, img_mapchip);
     player = new Player(img_turretchip);
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,10); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,40); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
 }
 
