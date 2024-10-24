@@ -123,10 +123,11 @@ class Map{
 }
 
 class Turret{
-    constructor(id,x,y,turretchip){
+    constructor(id,x,y,turretchip,range){
         this.id = id;
         this.x = x;
         this.y = y;
+        this.range = range;
         this.pict = new Image();
         this.pict.src = turretchip[this.id];
         this.bullets = [];
@@ -137,7 +138,17 @@ class Turret{
     }
 
     aim(){
-
+        let min = this.range;
+        let target = null;
+        for(let enemy = 0; enemy < enemies.length; enemy++){
+            let distance = Math.abs(this.x - enemies[enemy].x_grid) + Math.abs(this.y - enemies[enemy].y_grid);
+            if(distance <= min){
+                min = distance;
+                target = enemy;
+            }
+        }
+        console.log(min);
+        console.log(target);
     }
 
     shoot(){
@@ -225,10 +236,12 @@ class Enemy{
             this.x_canvas = this.x_canvas + x_move * this.frame;
             this.y_canvas = this.y_canvas + y_move * this.frame;
             i++;
-            if(i === this.speed){
-                this.flag_move = 0;
+            if(i > this.speed/2){
                 this.x_grid = x_candidate;
                 this.y_grid = y_candidate;
+            }
+            if(i === this.speed){
+                this.flag_move = 0;
                 clearInterval(interval);
             }
         }, 16);
@@ -313,7 +326,7 @@ function init(){
 
     map = new Map(map_data, img_mapchip);
     player = new Player(img_turretchip);
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,10); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,1001); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
     addTurret(0,1,0);
 }
@@ -323,7 +336,7 @@ function addTurret(id,x,y){
         'img/turret_temp1.png',
         'img/turret_temp2.png'
     ];
-    let turret = new Turret(id,x,y,img_turretchip);
+    let turret = new Turret(id,x,y,img_turretchip,5);
     turrets.push(turret);
 }
 
@@ -337,6 +350,9 @@ function update(){
     }
     removeEnemy();
     map.judge_GAMEOVER();
+    for(let turret of turrets){
+        turret.aim();
+    }
 }
 
 function draw(){
