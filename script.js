@@ -7,20 +7,20 @@ let pointer = {
     "x":0,
     "y":0
 }
-// let current_wave = 0;
-// let wave_contents = [
-//     {   
-//         wave_number: 1,
-//         enemies: [
-//             { type:'enemyType1', spawnTime:1 },
-//             { type:'enemyType1', spawnTime:1 },
-//             { type:'enemyType1', spawnTime:1 },
-//             { type:'enemyType1', spawnTime:1 },
-//             { type:'enemyType1', spawnTime:1 },
-//             { type:'enemyType1', spawnTime:1 },
-//         ]
-//     }
-// ];
+let timer = 0;
+let current_spawn = 0
+let wave_count = 0;
+let wave_mode = 'calm';
+let wave_contents = [
+    [
+        { type: 'enemyType1', move_interval: 10, spawnSec: 1 },
+        { type: 'enemyType1', move_interval: 15, spawnSec: 2 },
+        { type: 'enemyType1', move_interval: 23, spawnSec: 4 },
+        { type: 'enemyType1', move_interval: 33, spawnSec: 4 },
+        { type: 'enemyType1', move_interval: 13, spawnSec: 6 },
+        { type: 'enemyType1', move_interval: 19, spawnSec: 9 },
+    ]
+];
 
 class Player{
     constructor(turretchip){
@@ -410,6 +410,8 @@ function drawText(ctx, text, x, y, size, color) {
 }
 
 function gameloop(){
+    timer += 1
+
     if( game_mode === 'in_title' ){
         console.log('game_mode: in_title');
         
@@ -420,6 +422,7 @@ function gameloop(){
             if(event.code === 'Space'){
                 graphic.clearRect(0,0, CWidth, CHeight);
                 game_mode = 'in_game';
+                timer = 0          
             }
         });
     }
@@ -427,5 +430,37 @@ function gameloop(){
     if( game_mode === 'in_game' ){
         update();
         draw();
+
+        drawText(graphic, `resource: ${player.resource}`, CWidth*3/4, CHeight*5/6+50, 20, "rgb(150, 150, 150)");
+        if(wave_mode === 'calm'){
+            window.addEventListener('keydown', event => {
+                if(event.code === 'Space'){
+                    wave_mode = 'battle';
+                    timer = 0;
+                }
+            });
+            drawText(graphic, "Press [SPACE] to wave", CWidth*3/4, CHeight*5/6+20, 20, "rgb(150, 150, 150)");
+        } 
+
+
+        if(wave_mode === 'battle'){
+            spawn_flag = wave_contents[wave_count][current_spawn]
+
+            
+            console.log('current_spawn', current_spawn)
+            if( spawn_flag['spawnSec'] === Math.round(timer/60) && current_spawn < wave_contents[wave_count].length){
+                addEnemy(spawn_flag['move_interval'])
+                if( current_spawn-1 < wave_contents[wave_count].length ){
+                    current_spawn += 1
+                }
+            }
+
+            console.log(wave_contents[wave_count].length)
+            if( current_spawn === wave_contents[wave_count].length && enemies.length === 0){
+                wave_mode = 'calm';
+                wave_count += 1
+                timer = 0;
+            }
+        }
     }
 }
