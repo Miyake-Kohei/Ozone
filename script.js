@@ -17,6 +17,7 @@ class Player{
         this.picts = turretchip;
         this.pict = new Image();
         this.pict.src = turretchip[this.holdID];
+        this.resource = 5; //タレット1台1~3のコストを想定して初期値5
     }
 
     grab(){
@@ -68,9 +69,13 @@ class Player{
                 "x": Math.floor(this.x/map.tile0.width),
                 "y": Math.floor(this.y/map.tile0.height)
             }
-            if(map.map_data[gridc.y][gridc.x]==1){
+
+            const COST = 1;
+            if(map.map_data[gridc.y][gridc.x]==1 && this.resource >= COST){
                 map.map_data[gridc.y][gridc.x]=2;
                 addTurret(this.holdID,gridc.x,gridc.y);
+                this.resource -= COST;
+                console.log(this.resource, 'resource left')
             }
         }
     }
