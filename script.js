@@ -208,7 +208,7 @@ class Turret{
         //console.log(min);
         //console.log(target);
         try{
-            shoot(enemies[enemy]);
+            shoot(enemies[target]);
         }
         catch(e){
 
