@@ -22,6 +22,7 @@ let wave_contents = [
         { type: 'enemyType1', move_interval: 60, spawnSec: 9 },
     ]
 ];
+// test
 
 class Player{
     constructor(turretchip){
