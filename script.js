@@ -13,15 +13,22 @@ let current_spawn = 0
 let wave_count = 0;
 let wave_mode = 'calm';
 let wave_contents = [
-    [
-        { type: 'enemyType1', move_interval: 60, spawnSec: 1 },
-        { type: 'enemyType1', move_interval: 60, spawnSec: 2 },
-        { type: 'enemyType1', move_interval: 60, spawnSec: 4 },
-        { type: 'enemyType1', move_interval: 63, spawnSec: 4 },
-        { type: 'enemyType1', move_interval: 60, spawnSec: 6 },
-        { type: 'enemyType1', move_interval: 60, spawnSec: 9 },
-    ]
+    { type: 'enemyType1', move_interval: 60, spawnSec: 1 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 2 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 4 },
+    { type: 'enemyType1', move_interval: 63, spawnSec: 4 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 6 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 9 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 1 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 2 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 4 },
+    { type: 'enemyType1', move_interval: 63, spawnSec: 4 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 6 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 9 },
 ];
+let random_speed = 0;
+let random_contents = 7;
+
 
 class Player{
     constructor(turretchip){
@@ -171,7 +178,7 @@ class Bullet{
             const dx = (enemy.x_canvas + enemy.pict.width/2) - (this.x + this.pict.width/2);
             const dy = (enemy.y_canvas + enemy.pict.height/2) - (this.y + this.pict.height/2);
             const dis = Math.sqrt(dx*dx+dy*dy);
-            if(dis<enemy.pict.width/2){
+            if(dis<enemy.pict.width*2/3 ){
                 enemy.hp -= this.damage;
                 this.away = true;
                 console.log("hit");
@@ -418,7 +425,11 @@ function addTurret(id,x,y,speed){
 
 function addEnemy(_move_interval){
     const img_enemychip = ['img/enemy_temp.png'];
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _move_interval); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    _enemy_speed = _move_interval-Math.floor( Math.random() * random_speed);
+    if(_enemy_speed <= 0){
+        _enemy_speed = 1;
+    }
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _enemy_speed,100); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
 }
 
@@ -496,7 +507,8 @@ function drawText(ctx, text, x, y, size, color) {
 }
 
 function gameloop(){
-    timer += 1
+    timer += 1;
+    console.log(game_mode);
 
     if( game_mode === 'in_title' ){
         console.log('game_mode: in_title');
@@ -516,9 +528,11 @@ function gameloop(){
     if( game_mode === 'in_game' ){
         update();
         draw();
+        console.log(wave_mode)
 
         drawText(graphic, `resource: ${player.resource}`, CWidth*3/4, CHeight*5/6+50, 20, "rgb(150, 150, 150)");
         if(wave_mode === 'calm'){
+            current_spawn = 0;
             window.addEventListener('keydown', event => {
                 if(event.code === 'Space'){
                     wave_mode = 'battle';
@@ -530,22 +544,23 @@ function gameloop(){
 
 
         if(wave_mode === 'battle'){
-            spawn_flag = wave_contents[wave_count][current_spawn]
+            spawn_flag = wave_contents[current_spawn];
 
-            
-            console.log('current_spawn', current_spawn)
-            if( spawn_flag['spawnSec'] === Math.round(timer/60) && current_spawn < wave_contents[wave_count].length){
-                addEnemy(spawn_flag['move_interval'])
-                if( current_spawn-1 < wave_contents[wave_count].length ){
-                    current_spawn += 1
-                }
+            //console.log(wave_contents[wave_count].length)
+            if( current_spawn === random_contents && enemies.length === 0){
+                wave_mode = 'calm';
+                wave_count += 1;
+                random_contents += Math.floor( Math.random() * 2);
+                random_speed += Math.floor( Math.random() * 20);
+                timer = 0;
             }
 
-            console.log(wave_contents[wave_count].length)
-            if( current_spawn === wave_contents[wave_count].length && enemies.length === 0){
-                wave_mode = 'calm';
-                wave_count += 1
-                timer = 0;
+            console.log('current_spawn', current_spawn)
+            if( spawn_flag['spawnSec'] === Math.round(timer/60) && current_spawn < random_contents){
+                addEnemy(spawn_flag['move_interval']);
+                if( current_spawn < random_contents ){
+                    current_spawn += 1
+                }
             }
         }
     }
