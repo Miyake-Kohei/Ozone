@@ -1,5 +1,6 @@
 let canvas,graphic,CWidth,CHeight;
 let enemies = [];
+let enemies_resize = [];
 let turrets = [];
 let bullets = [];
 let game_mode = 'in_title';
@@ -166,33 +167,93 @@ class Map_old{
 
 }
 
-class Map{
-    constructor(map_data, mapchip){
-        this.map_data = map_data;
-        
+class ResizeImg{
+    constructor(_img_source, _x, _y){
         this.pre_imgs = [];
         this.tiles = [];
+        this.x = _x;
+        this.y = _y;
         this.TILE_SIZE = 64;
-        const NUMBER_CHIP_TYPE = mapchip.length
+        const NUMBER_CHIP_TYPE = 1
 
         for (let i = 0; i < NUMBER_CHIP_TYPE; i++) {
             this.pre_imgs[i] = new Image();
-            this.pre_imgs[i].src = mapchip[i]; // 画像のソースを設定
+            this.pre_imgs[i].src = _img_source; // 画像のソースを設定
 
             // 拡縮された画像を保持するためのキャンバス
             this.tiles[i] = document.createElement('canvas');
             this.tiles[i].width = this.TILE_SIZE;
             this.tiles[i].height = this.TILE_SIZE;
-            const ctx = this.tiles[i].getContext('2d');
+            const tiles_ctx = this.tiles[i].getContext('2d');
 
-            // 画像が読み込まれた後にキャンバスに描画
+            // キャンバスに描画
             this.pre_imgs[i].onload = () => {
-                ctx.drawImage(this.pre_imgs[i], 0, 0, this.pre_imgs[i].width, this.pre_imgs[i].height, 0, 0, this.TILE_SIZE, this.TILE_SIZE);
-                // ↓ではなぜか表示できませんでした
-                // ctx.drawImage(this.pre_imgs[i], this.pre_imgs[i].width, this.pre_imgs[i].height, this.TILE_SIZE, this.TILE_SIZE);
+                tiles_ctx.drawImage(this.pre_imgs[i], 0, 0, this.pre_imgs[i].width, this.pre_imgs[i].height, 0, 0, this.TILE_SIZE, this.TILE_SIZE);
+            };
+        }
+    }
+
+    draw(){
+        graphic.drawImage(this.tiles[0], this.x, this.y);
+    }
+}
+
+//なぜかエラーになる。script.js:232 Uncaught TypeError: Failed to execute 'drawImage' on 'CanvasRenderingContext2D': The provided value is not of type '(CSSImageValue or HTMLCanvasElement or HTMLImageElement or HTMLVideoElement or ImageBitmap or OffscreenCanvas or SVGImageElement or VideoFrame)'.
+// function resized_img(img_path, img_size) {
+//     let pre_img;
+//     let actual_img;
+//     let TILE_SIZE = img_size;
+
+//     pre_img = new Image();
+//     pre_img.src = img_path; // 画像のソースを設定
+
+//     // 拡縮された画像を保持するためのキャンバス
+//     actual_img = document.createElement('canvas');
+//     actual_img.width = TILE_SIZE;
+//     actual_img.height = TILE_SIZE;
+//     let actual_img_ctx = actual_img.getContext('2d');
+
+//     // 画像が読み込まれた後にキャンバスに描画
+//     pre_img.onload = () => {
+//         actual_img_ctx.drawImage(pre_img, 0, 0, pre_img.width, pre_img.height, 0, 0, TILE_SIZE, TILE_SIZE);
+//     };
+
+//     return actual_img;
+// } 
+
+
+class Map{
+    constructor(map_data, mapchip){
+        
+        // ある画像があり、それを指定の大きさに変更したい。
+        // 指定の大きさの画像オブジェを返し、それを描画に使用する。
+        this.pre_imgs = [];
+        this.tiles = [];
+        this.TILE_SIZE = 64;
+        const CHIP = mapchip
+
+        for (let i = 0; i < CHIP.length; i++) {
+            this.pre_imgs[i] = new Image();
+            this.pre_imgs[i].src = CHIP[i]; // 画像のソースを設定
+
+            // 拡縮された画像を保持するためのキャンバス
+            this.tiles[i] = document.createElement('canvas');
+            this.tiles[i].width = this.TILE_SIZE;
+            this.tiles[i].height = this.TILE_SIZE;
+            const tiles_ctx = this.tiles[i].getContext('2d'); //ここをthis.~~にするとプリンが描画されなくなる
+
+            // キャンバスに描画
+            this.pre_imgs[i].onload = () => {
+                tiles_ctx.drawImage(this.pre_imgs[i], 0, 0, this.pre_imgs[i].width, this.pre_imgs[i].height, 0, 0, this.TILE_SIZE, this.TILE_SIZE);
             };
         }
 
+        // for (let i=0; i<mapchip.lengh; i++) {
+        //     this.tiles[i] = this.resized_img(mapchip[i], 64)
+        //     console.log("asdfae", this.tiles[i])
+        // }
+
+        this.map_data = map_data;
         this.enemy_base = [0,0];
         this.player_base = [8,4];
         this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
@@ -214,6 +275,28 @@ class Map{
             }
         }
     }
+
+    // resized_img(img_path, img_size) {
+    //     let pre_img;
+    //     let actual_img;
+    //     let TILE_SIZE = img_size;
+
+    //     pre_img = new Image();
+    //     pre_img.src = img_path; // 画像のソースを設定
+
+    //     // 拡縮された画像を保持するためのキャンバス
+    //     actual_img = document.createElement('canvas');
+    //     actual_img.width = TILE_SIZE;
+    //     actual_img.height = TILE_SIZE;
+    //     let actual_img_ctx = actual_img.getContext('2d');
+
+    //     // 画像が読み込まれた後にキャンバスに描画
+    //     pre_img.onload = () => {
+    //         actual_img_ctx.drawImage(pre_img, 0, 0, pre_img.width, pre_img.height, 0, 0, TILE_SIZE, TILE_SIZE);
+    //     };
+
+    //     return actual_img;
+    // } 
 
     judge_GAMEOVER(){
         for(let i = 0; i < enemies.length; i++) {
@@ -261,6 +344,7 @@ class Bullet{
         for(let enemy of enemies){
             const dx = (enemy.x_canvas + enemy.pict.width/2) - (this.x + this.pict.width/2);
             const dy = (enemy.y_canvas + enemy.pict.height/2) - (this.y + this.pict.height/2);
+            console.log(enemy.pict.width)
             const dis = Math.sqrt(dx*dx+dy*dy);
             if(dis<enemy.pict.width/2){
                 enemy.hp -= this.damage;
@@ -335,6 +419,30 @@ class Enemy{
         this.x_grid_before = null;
         this.y_grid_before = null;
         this.hp = HP;
+
+        // 画像拡縮の処理
+        this.pre_picts = [];
+        this.resized_picts = [];
+        this.TILE_SIZE = 64;
+        const CHIP = enemychip
+
+        for (let i = 0; i < CHIP.length; i++) {
+            this.pre_picts[i] = new Image();
+            this.pre_picts[i].src = CHIP[i]; // 画像のソースを設定
+
+            // 拡縮された画像を保持するためのキャンバス
+            this.resized_picts[i] = document.createElement('canvas');
+            this.resized_picts[i].width = this.TILE_SIZE;
+            this.resized_picts[i].height = this.TILE_SIZE;
+            const resized_picts_ctx = this.resized_picts[i].getContext('2d');
+
+            // キャンバスに描画
+            this.pre_picts[i].onload = () => {
+                resized_picts_ctx.drawImage(this.pre_picts[i], 0, 0, this.pre_picts[i].width, this.pre_picts[i].height, 0, 0, this.TILE_SIZE, this.TILE_SIZE);
+            };
+        }
+        // 画像拡縮の処理　終
+        this.pict = this.resized_picts[0]
     }
 
     draw(){
@@ -484,7 +592,7 @@ function init(){
     ];
 
     const img_enemychip = [
-        'img/enemy_temp.png'
+        'img/enemy_move_inv.png'
     ];
     
     const img_turretchip = [
@@ -496,6 +604,7 @@ function init(){
     player = new Player(img_turretchip);
     let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,40,500); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
+    resizeimg = new ResizeImg('img/mapchip1_a.png', 100, 100)
 }
 
 function addTurret(id,x,y,speed){
@@ -509,7 +618,7 @@ function addTurret(id,x,y,speed){
 
 function addEnemy(_move_interval){
     const img_enemychip = ['img/enemy_temp.png'];
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _move_interval); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _move_interval,500); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
 }
 
@@ -553,6 +662,7 @@ function draw(){
     }
     player.drawUI();
     player.draw();
+    resizeimg.draw();
 }
 
 function keydown(e){
