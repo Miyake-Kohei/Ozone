@@ -80,11 +80,12 @@ class Player{
         }
     }
 
+    // Mapクラス内を大幅に変えたので、map.tile0 → map.tiles[0]にしました。byまさ
     deploy(map){
         if(this.x>0&&this.x<canvas.width&&this.y>0&&this.y<64*6){
             let gridc = {
-                "x": Math.floor(this.x/map.tile0.width),
-                "y": Math.floor(this.y/map.tile0.height)
+                "x": Math.floor(this.x/map.tiles[0].width),
+                "y": Math.floor(this.y/map.tiles[0].height)
             }
 
             const COST = 1;
@@ -98,7 +99,7 @@ class Player{
     }
 }
 
-class Map{
+class Map_old{
     constructor(map_data, mapchip){
         this.map_data = map_data;
         this.tile0 = new Image();
@@ -111,17 +112,105 @@ class Map{
         this.vrble_height = this.vrble_width
         // this.vrble_height = graphic.canvas.height / Object.keys(this.map_data).length;
 
+        this.TILE_SIZE = 64;
+
+        // 拡縮された画像を保持するためのキャンバス
+        this.canvas0 = document.createElement('canvas');
+        this.canvas1 = document.createElement('canvas');
+        this.canvas0.width = this.TILE_SIZE;
+        this.canvas0.height = this.TILE_SIZE;
+        this.canvas1.width = this.TILE_SIZE;
+        this.canvas1.height = this.TILE_SIZE;
+
+        const ctx0 = this.canvas0.getContext('2d');
+        const ctx1 = this.canvas1.getContext('2d');
+
+        // 画像をキャンバスに描画して拡縮
+        this.tile0.onload = () => {
+            ctx0.drawImage(this.tile0, 0, 0, this.tile0.width, this.tile0.height, 0, 0, this.TILE_SIZE, this.TILE_SIZE);
+        };
+        this.tile1.onload = () => {
+            ctx1.drawImage(this.tile1, 0, 0, this.tile1.width, this.tile1.height, 0, 0, this.TILE_SIZE, this.TILE_SIZE);
+        };
     }
 
     draw(){
         for (let y = 0; y < this.map_data.length; y++) {
             for (let x = 0; x < this.map_data[y].length; x++) {
                 if(this.map_data[y][x]===0){
-                    graphic.drawImage(this.tile0, this.tile0.width*x, this.tile0.height*y);
+                    graphic.drawImage(this.canvas0, this.TILE_SIZE*x, this.TILE_SIZE*y);
                 }else{
-                    graphic.drawImage(this.tile1, this.tile1.width*x, this.tile1.height*y);
+                    graphic.drawImage(this.canvas1, this.TILE_SIZE*x, this.TILE_SIZE*y);
                 }
 
+            }
+        }
+    }
+
+    judge_GAMEOVER(){
+        for(let i = 0; i < enemies.length; i++) {
+            let emy = enemies[i];
+            this.dx_judge = Math.abs(emy.x_grid - this.player_base[0]) < 1;
+            this.dy_judge = Math.abs(emy.y_grid - this.player_base[1]) < 1;
+
+            if (this.dx_judge && this.dy_judge) {
+                //_before_enemies = enemies;
+                emy.isDead = true;
+                removeEnemy();
+                game_mode = 'GAMEOVER'
+                //console.log('removeEnemy: ', _before_enemies, '→', enemies);
+            }
+        }
+
+    }
+
+}
+
+class Map{
+    constructor(map_data, mapchip){
+        this.map_data = map_data;
+        
+        this.pre_imgs = [];
+        this.tiles = [];
+        this.TILE_SIZE = 64;
+        const NUMBER_CHIP_TYPE = mapchip.length
+
+        for (let i = 0; i < NUMBER_CHIP_TYPE; i++) {
+            this.pre_imgs[i] = new Image();
+            this.pre_imgs[i].src = mapchip[i]; // 画像のソースを設定
+
+            // 拡縮された画像を保持するためのキャンバス
+            this.tiles[i] = document.createElement('canvas');
+            this.tiles[i].width = this.TILE_SIZE;
+            this.tiles[i].height = this.TILE_SIZE;
+            const ctx = this.tiles[i].getContext('2d');
+
+            // 画像が読み込まれた後にキャンバスに描画
+            this.pre_imgs[i].onload = () => {
+                ctx.drawImage(this.pre_imgs[i], 0, 0, this.pre_imgs[i].width, this.pre_imgs[i].height, 0, 0, this.TILE_SIZE, this.TILE_SIZE);
+                // ↓ではなぜか表示できませんでした
+                // ctx.drawImage(this.pre_imgs[i], this.pre_imgs[i].width, this.pre_imgs[i].height, this.TILE_SIZE, this.TILE_SIZE);
+            };
+        }
+
+        this.enemy_base = [0,0];
+        this.player_base = [8,4];
+        this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
+        this.vrble_height = this.vrble_width
+        // this.vrble_height = graphic.canvas.height / Object.keys(this.map_data).length;
+    }
+
+    draw(){
+        for (let y = 0; y < this.map_data.length; y++) {
+            for (let x = 0; x < this.map_data[y].length; x++) {
+                if (this.map_data[y][x] === 0) {
+                    graphic.drawImage(this.tiles[0], this.TILE_SIZE*x, this.TILE_SIZE*y);
+                }else{
+                    graphic.drawImage(this.tiles[1], this.TILE_SIZE*x, this.TILE_SIZE*y);
+                }
+                // ↓ をここと置き換えるとバグの温床になりそうなので、考え中（タレットの床番号が2であるため）
+                // let tileIndex = this.map_data[y][x]
+                // graphic.drawImage(this.tiles[tileIndex], this.TILE_SIZE*x, this.TILE_SIZE*y);
             }
         }
     }
@@ -390,8 +479,8 @@ function init(){
     ];
 
     const img_mapchip = [
-        'img/mapchip0.png',
-        'img/mapchip1.png'
+        'img/mapchip0_a.png',
+        'img/mapchip1_a.png'
     ];
 
     const img_enemychip = [
