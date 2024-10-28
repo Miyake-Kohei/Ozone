@@ -31,9 +31,12 @@ let random_speed = 0;
 let random_contents = 7;
 
 // 「img/chara1_animation/1,2,3,... .PNG」という要素を16個もつ配列を生成
-const chara1_animation_imgs = Array.from({ length: 16 }, (_, i) => `img/chara1_animation/${i + 1}.PNG`);
+const chara_animation_imgs = [
+    Array.from({ length: 16 }, (_, i) => `img/chara1_animation/${i + 1}.PNG`),
+    Array.from({ length: 16 }, (_, i) => `img/chara2_animation/${i + 1}.PNG`),
+    Array.from({ length: 16 }, (_, i) => `img/chara3_animation/${i + 1}.PNG`)
+];
 
-    
 
 class Player{
     constructor(turretchip){
@@ -245,13 +248,16 @@ class Turret{
         // this.pict.src = turretchip[this.id];
         
         // 静止画用
-        this.resized_picts = resizeImages(turretchip, map.TILE_SIZE) // 画像拡縮の処理
-        this.pict = this.resized_picts[this.id] //this.idでどのタレットの画像を引くか決める
+        // this.resized_picts = resizeImages(turretchip, map.TILE_SIZE) // 画像拡縮の処理
+        // this.pict = this.resized_picts[this.id] //this.idでどのタレットの画像を引くか決める
 
         // アニメーション用
-        this.resized_animations = resizeImages(chara1_animation_imgs, map.TILE_SIZE);
-        this.anima = this.resized_animations;
-        this.anima_idx = 1;
+        this.resized_animations = resizeImages(chara_animation_imgs[this.id], map.TILE_SIZE);
+        this.animas = this.resized_animations;
+        this.animas_idx = 1;
+        // 過去書いた処理を使うための代入。
+        // this.animas内の要素はどれも大きさ同じなので[0]を使用。
+        this.pict = this.animas[0] 
 
     }
 
@@ -262,14 +268,14 @@ class Turret{
 
     // アニメーションの番号送りのみを行う（init()内のsetIntervalで使用）
     proceed_animation(){
-        this.anima_idx = (this.anima_idx+1) % this.anima.length;
+        this.animas_idx = (this.animas_idx+1) % this.animas.length;
     }
-    // 画像の表示のみ行う。（グローバルのdraw()内で使用。）
+    // 画像の表示のみ行う。（グローバルのdraw()内で使用）
     draw_animation(){
         graphic.drawImage(
-            this.anima[this.anima_idx], 
-            this.anima[this.anima_idx].width*this.x, 
-            this.anima[this.anima_idx].height*this.y);
+            this.animas[this.animas_idx], 
+            this.animas[this.animas_idx].width*this.x, 
+            this.animas[this.animas_idx].height*this.y);
     }
 
     aim(){
@@ -480,7 +486,8 @@ function init(){
     
     const img_turretchip = [
         'img/dot_chara1.png',
-        'img/dot_chara2.png'
+        'img/dot_chara2.png',
+        'img/dot_chara3.png'
     ]
     // const img_turretchip = [
     //     'img/turret_temp1.png',
