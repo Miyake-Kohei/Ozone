@@ -561,13 +561,18 @@ function drawText(ctx, text, x, y, size, color) {
     ctx.fillText(text, x, y);
 }
 
+
+
+const title_image = new Image();
+title_image.src = 'img/enemy_move_inv.png'
 function gameloop(){
     timer += 1
 
     if( game_mode === 'in_title' ){
         console.log('game_mode: in_title');
-        
-        drawText(graphic, "(Title)", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
+    
+        graphic.drawImage(title_image,60,0)
+        drawText(graphic, "Sweet Siege", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
         drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 60, "rgb(50, 50, 50)");
         
         window.addEventListener('keydown', event => {
