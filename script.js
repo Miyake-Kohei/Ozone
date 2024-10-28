@@ -32,10 +32,15 @@ class Player{
         this.y = pointer.y;
         this.hold = false;
         this.holdID = 0;
-        this.picts = turretchip;
-        this.pict = new Image();
-        this.pict.src = turretchip[this.holdID];
+        // this.picts = turretchip;
+        // this.pict = new Image();
+        // this.pict.src = turretchip[this.holdID];
         this.resource = 5; //タレット1台1~3のコストを想定して初期値5
+
+        //↓新たに追加しました byまさ
+        this.resized_picts = resizeImages(turretchip, map.TILE_SIZE) //画像拡縮の処理
+        this.picts = this.resized_picts; //リサイズ画像の配列
+        this.pict = this.resized_picts[this.holdID];  //リサイズ画像の１つ１つ。 
     }
 
     grab(){
@@ -59,7 +64,8 @@ class Player{
         this.x = pointer.x;
         this.y = pointer.y;
         if(this.hold){
-            this.pict.src = this.picts[this.holdID]
+            // this.pict.src = this.picts[this.holdID]　//左を↓に置き換えました byまさ
+            this.pict = this.resized_picts[this.holdID];  //リサイズ画像を代入。
             graphic.drawImage(this.pict, this.x-this.pict.width/2, this.y-this.pict.height/2);
         }
     }
@@ -73,8 +79,9 @@ class Player{
 
         let i=0
         for(let pict of this.picts){
-            let portrait = new Image();
-            portrait.src = pict;
+            // let portrait = new Image(); //画像拡縮処理するようにしたのでコメントアウトしました byまさ
+            // portrait.src = pict;
+            let portrait = pict
         
             graphic.drawImage(portrait, portrait.width*(2*i+1), displayY); 
             i++;       
@@ -104,7 +111,7 @@ class Map{
     constructor(map_data, mapchip){
         this.TILE_SIZE = 64;
         this.resized_picts = resizeImages(mapchip, this.TILE_SIZE) //画像拡縮の処理
-        this.tiles = [this.resized_picts[0], this.resized_picts[1]]; //リサイズ画像を代入
+        this.tiles = [this.resized_picts[0], this.resized_picts[1]]; //リサイズ画像を代入。ここだけpictsではなくtilesという名前になっている
 
         for (let i=0; i<mapchip.lengh; i++) {
             this.tiles[i] = this.resized_img(mapchip[i], 64)
@@ -155,14 +162,15 @@ class Bullet{
     constructor(x,y,vx,vy,pict){
         this.x = x;
         this.y = y;
-        this.pict = new Image();
-        this.pict.src = pict;
+        // this.pict = new Image();
+        // this.pict.src = pict;
         this.vx = vx;
         this.vy = vy;
         this.damage = 10;
         this.away = false;
-        // this.resized_picts = resizeImages([pict], map.TILE_SIZE*0.3) //pictはstrなので、配列に直して与える
-        // this.pict = this.resized_picts[0]
+
+        this.resized_picts = resizeImages([pict], map.TILE_SIZE*0.3) //pictはstrなので、配列に直して与えました byまさ
+        this.pict = this.resized_picts[0]
     }
 
     draw(){
@@ -236,7 +244,8 @@ class Turret{
         const dis = Math.sqrt(dx*dx+dy*dy);
         const vx = (dx/dis)*this.bulletSpeed;
         const vy = (dy/dis)*this.bulletSpeed;
-        let bullet = new Bullet((this.x+1/2)*this.pict.width,(this.y+1/2)*this.pict.height,vx,vy,"img/testbullet.png");
+        const img = "img/bullet_pink.PNG" // 画像のパスを変えました byまさ
+        let bullet = new Bullet((this.x+1/2)*this.pict.width,(this.y+1/2)*this.pict.height,vx,vy,img);
         bullets.push(bullet);
     }
 }
@@ -414,14 +423,14 @@ function init(){
         'img/enemy_move_inv.png'
     ];
     
-    // const img_turretchip = [
-    //     'img/dot_chara1.png',
-    //     'img/dot_chara2.png'
-    // ]
     const img_turretchip = [
-        'img/turret_temp1.png',
-        'img/turret_temp2.png'
-    ];
+        'img/dot_chara1.png',
+        'img/dot_chara2.png'
+    ]
+    // const img_turretchip = [
+    //     'img/turret_temp1.png',
+    //     'img/turret_temp2.png'
+    // ];
 
     map = new Map(map_data, img_mapchip);
     player = new Player(img_turretchip);
@@ -430,14 +439,14 @@ function init(){
 }
 
 function addTurret(id,x,y,speed){
-    // const img_turretchip = [
-        // 'img/dot_chara1.png',
-        // 'img/dot_chara2.png'
-    // ];
     const img_turretchip = [
-        'img/turret_temp1.png',
-        'img/turret_temp2.png'
+        'img/dot_chara1.png',
+        'img/dot_chara2.png'
     ];
+    // const img_turretchip = [
+    //     'img/turret_temp1.png',
+    //     'img/turret_temp2.png'
+    // ];
     let turret = new Turret(id,x,y,speed,img_turretchip,5);
     turrets.push(turret);
 }
