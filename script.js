@@ -30,6 +30,10 @@ let wave_contents = [
 let random_speed = 0;
 let random_contents = 7;
 
+// 「img/chara1_animation/1,2,3,... .PNG」という要素を16個もつ配列を生成
+const chara1_animation_imgs = Array.from({ length: 16 }, (_, i) => `img/chara1_animation/${i + 1}.PNG`);
+
+    
 
 class Player{
     constructor(turretchip){
@@ -239,13 +243,33 @@ class Turret{
         this.range = range;
         // this.pict = new Image();
         // this.pict.src = turretchip[this.id];
- 
+        
+        // 静止画用
         this.resized_picts = resizeImages(turretchip, map.TILE_SIZE) // 画像拡縮の処理
         this.pict = this.resized_picts[this.id] //this.idでどのタレットの画像を引くか決める
+
+        // アニメーション用
+        this.resized_animations = resizeImages(chara1_animation_imgs, map.TILE_SIZE);
+        this.anima = this.resized_animations;
+        this.anima_idx = 1;
+
     }
 
-    draw(){
-        graphic.drawImage(this.pict, this.pict.width*this.x, this.pict.height*this.y);
+    // 静止画用
+    // draw(){
+    //     graphic.drawImage(this.pict, this.pict.width*this.x, this.pict.height*this.y);
+    // }
+
+    // アニメーションの番号送りのみを行う（init()内のsetIntervalで使用）
+    proceed_animation(){
+        this.anima_idx = (this.anima_idx+1) % this.anima.length;
+    }
+    // 画像の表示のみ行う。（グローバルのdraw()内で使用。）
+    draw_animation(){
+        graphic.drawImage(
+            this.anima[this.anima_idx], 
+            this.anima[this.anima_idx].width*this.x, 
+            this.anima[this.anima_idx].height*this.y);
     }
 
     aim(){
@@ -429,6 +453,7 @@ onload = function(){
     document.onmousedown = mousedown;
     document.onmouseup = mouseup;
 
+    setInterval("turret_animation_proceed()", 70) // アニメーションの番号送り専用
     setInterval("gameloop()",16)
 }
 
@@ -529,7 +554,8 @@ function draw(){
         enemy.draw();
     }
     for(let turret of turrets){
-        turret.draw();
+        // turret.draw();
+        turret.draw_animation();
     }
     for(let bullet of bullets){
         bullet.draw();
@@ -560,6 +586,12 @@ function mousemove(e){
 
 function mouseover(e){
 
+}
+
+function turret_animation_proceed(){
+    for (let turret of turrets) {
+        turret.proceed_animation();
+    }
 }
 
 // actual_drawのブランチで導入
@@ -610,9 +642,9 @@ function gameloop(){
 
     if( game_mode === 'in_title' ){
         console.log('game_mode: in_title');
-    
+
         graphic.drawImage(title_image,60,0)
-        drawText(graphic, "Sweet Siege", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
         drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 60, "rgb(50, 50, 50)");
         
         window.addEventListener('keydown', event => {
