@@ -13,18 +13,18 @@ let current_spawn = 0
 let wave_count = 0;
 let wave_mode = 'calm';
 let wave_contents = [
-    { type: 'enemyType1', move_interval: 60, spawnSec: 1 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 2 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 4 },
-    { type: 'enemyType1', move_interval: 63, spawnSec: 4 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 6 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 9 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 1 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 2 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 4 },
-    { type: 'enemyType1', move_interval: 63, spawnSec: 4 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 6 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 9 },
+    { type: 'enemyType1', move_interval: 10, spawnSec: 1 },
+    { type: 'enemyType1', move_interval: 10, spawnSec: 5 },
+    { type: 'enemyType1', move_interval: 10, spawnSec: 10 },
+    { type: 'enemyType1', move_interval: 10, spawnSec: 15 },
+    { type: 'enemyType1', move_interval: 10, spawnSec: 20 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 25 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 30 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 35 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 40 },
+    { type: 'enemyType1', move_interval: 63, spawnSec: 19 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 21 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 23 },
 ];
 let random_speed = 0;
 let random_contents = 7;
@@ -150,7 +150,7 @@ class Map{
 }
 
 class Bullet{
-    constructor(x,y,vx,vy,pict){
+    constructor(x,y,vx,vy,pict,id,bulletSpeed,target){
         this.x = x;
         this.y = y;
         this.pict = new Image();
@@ -159,6 +159,9 @@ class Bullet{
         this.vy = vy;
         this.damage = 10;
         this.away = false;
+        this.id = id;
+        this.bulletSpeed = bulletSpeed;
+        this.target = target;
     }
 
     draw(){
@@ -173,12 +176,34 @@ class Bullet{
         }
     }
 
+    homing(){
+        try{
+            if(this.target.isDead === false){
+                const dx = this.target.x_canvas - this.x;
+                const dy = this.target.y_canvas - this.y;
+                const dis = Math.sqrt(dx*dx+dy*dy);
+                this.vx = (dx/dis)*this.bulletSpeed;
+                this.vy = (dy/dis)*this.bulletSpeed;
+            }
+            console.log(this.vx);
+            console.log(this.vy);
+            console.log(this.target);
+        }
+        catch(e){
+        }
+        this.x += this.vx;
+        this.y += this.vy;
+        if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height){
+            this.away = true;
+        }
+    }
+
     hit(enemies){
         for(let enemy of enemies){
             const dx = (enemy.x_canvas + enemy.pict.width/2) - (this.x + this.pict.width/2);
             const dy = (enemy.y_canvas + enemy.pict.height/2) - (this.y + this.pict.height/2);
             const dis = Math.sqrt(dx*dx+dy*dy);
-            if(dis<enemy.pict.width*2/3 ){
+            if(dis<enemy.pict.width*3/5){
                 enemy.hp -= this.damage;
                 this.away = true;
                 console.log("hit");
@@ -228,7 +253,7 @@ class Turret{
         const dis = Math.sqrt(dx*dx+dy*dy);
         const vx = (dx/dis)*this.bulletSpeed;
         const vy = (dy/dis)*this.bulletSpeed;
-        let bullet = new Bullet((this.x+1/2)*this.pict.width,(this.y+1/2)*this.pict.height,vx,vy,"img/testbullet.png");
+        let bullet = new Bullet((this.x+1/2)*this.pict.width,(this.y+1/2)*this.pict.height,vx,vy,"img/testbullet.png",this.id,this.bulletSpeed,target);
         bullets.push(bullet);
     }
 }
@@ -448,7 +473,12 @@ function update(){
     }
     removeEnemy();
     for(let bullet of bullets){
-        bullet.fly();
+        if(bullet.id === 0){
+            bullet.fly();
+        }
+        if(bullet.id === 1){
+            bullet.homing();
+        }
         bullet.hit(enemies);
     }
     removeBullet();
