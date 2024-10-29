@@ -459,7 +459,7 @@ onload = function(){
     document.onmousedown = mousedown;
     document.onmouseup = mouseup;
 
-    setInterval("turret_animation_proceed()", 70) // アニメーションの番号送り専用
+    setInterval("turret_animation_proceed(game_mode)", 70) // アニメーションの番号送り専用
     setInterval("gameloop()",16)
 }
 
@@ -595,9 +595,11 @@ function mouseover(e){
 
 }
 
-function turret_animation_proceed(){
-    for (let turret of turrets) {
-        turret.proceed_animation();
+function turret_animation_proceed(game_mode){
+    if (game_mode === 'in_game') {
+        for (let turret of turrets) {
+            turret.proceed_animation();
+        }
     }
 }
 
