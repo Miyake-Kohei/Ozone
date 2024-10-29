@@ -30,6 +30,13 @@ let wave_contents = [
 let random_speed = 0;
 let random_contents = 7;
 
+// 「img/chara1_animation/1,2,3,... .PNG」という要素を16個もつ配列を生成
+const chara_animation_imgs = [
+    Array.from({ length: 16 }, (_, i) => `img/chara1_animation/${i + 1}.PNG`),
+    Array.from({ length: 16 }, (_, i) => `img/chara2_animation/${i + 1}.PNG`),
+    Array.from({ length: 16 }, (_, i) => `img/chara3_animation/${i + 1}.PNG`)
+];
+
 
 class Player{
     constructor(turretchip){
@@ -239,13 +246,36 @@ class Turret{
         this.range = range;
         // this.pict = new Image();
         // this.pict.src = turretchip[this.id];
- 
-        this.resized_picts = resizeImages(turretchip, map.TILE_SIZE) // 画像拡縮の処理
-        this.pict = this.resized_picts[this.id] //this.idでどのタレットの画像を引くか決める
+        
+        // 静止画用
+        // this.resized_picts = resizeImages(turretchip, map.TILE_SIZE) // 画像拡縮の処理
+        // this.pict = this.resized_picts[this.id] //this.idでどのタレットの画像を引くか決める
+
+        // アニメーション用
+        this.resized_animations = resizeImages(chara_animation_imgs[this.id], map.TILE_SIZE);
+        this.animas = this.resized_animations;
+        this.animas_idx = 1;
+        // 過去書いた処理を使うための代入。
+        // this.animas内の要素はどれも大きさ同じなので[0]を使用。
+        this.pict = this.animas[0] 
+
     }
 
-    draw(){
-        graphic.drawImage(this.pict, this.pict.width*this.x, this.pict.height*this.y);
+    // 静止画用
+    // draw(){
+    //     graphic.drawImage(this.pict, this.pict.width*this.x, this.pict.height*this.y);
+    // }
+
+    // アニメーションの番号送りのみを行う（init()内のsetIntervalで使用）
+    proceed_animation(){
+        this.animas_idx = (this.animas_idx+1) % this.animas.length;
+    }
+    // 画像の表示のみ行う。（グローバルのdraw()内で使用）
+    draw_animation(){
+        graphic.drawImage(
+            this.animas[this.animas_idx], 
+            this.animas[this.animas_idx].width*this.x, 
+            this.animas[this.animas_idx].height*this.y);
     }
 
     aim(){
@@ -429,6 +459,7 @@ onload = function(){
     document.onmousedown = mousedown;
     document.onmouseup = mouseup;
 
+    setInterval("turret_animation_proceed(game_mode)", 70) // アニメーションの番号送り専用
     setInterval("gameloop()",16)
 }
 
@@ -455,7 +486,8 @@ function init(){
     
     const img_turretchip = [
         'img/dot_chara1.png',
-        'img/dot_chara2.png'
+        'img/dot_chara2.png',
+        'img/dot_chara3.png'
     ]
     // const img_turretchip = [
     //     'img/turret_temp1.png',
@@ -529,7 +561,8 @@ function draw(){
         enemy.draw();
     }
     for(let turret of turrets){
-        turret.draw();
+        // turret.draw();
+        turret.draw_animation();
     }
     for(let bullet of bullets){
         bullet.draw();
@@ -560,6 +593,14 @@ function mousemove(e){
 
 function mouseover(e){
 
+}
+
+function turret_animation_proceed(game_mode){
+    if (game_mode === 'in_game') {
+        for (let turret of turrets) {
+            turret.proceed_animation();
+        }
+    }
 }
 
 // actual_drawのブランチで導入
@@ -610,9 +651,9 @@ function gameloop(){
 
     if( game_mode === 'in_title' ){
         console.log('game_mode: in_title');
-    
+
         graphic.drawImage(title_image,60,0)
-        drawText(graphic, "Sweet Siege", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
         drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 60, "rgb(50, 50, 50)");
         
         window.addEventListener('keydown', event => {
