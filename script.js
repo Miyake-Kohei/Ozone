@@ -11,24 +11,41 @@ let pointer = {
 }
 let timer = 0;
 let current_spawn = 0
+let turret_cost = [
+    1,2,3
+];
+let enemy_level = 1.0;
 let wave_count = 0;
 let wave_mode = 'calm';
 let wave_contents = [
-    { type: 'enemyType1', move_interval: 10, spawnSec: 1 },
-    { type: 'enemyType1', move_interval: 10, spawnSec: 5 },
-    { type: 'enemyType1', move_interval: 10, spawnSec: 10 },
-    { type: 'enemyType1', move_interval: 10, spawnSec: 15 },
-    { type: 'enemyType1', move_interval: 10, spawnSec: 20 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 25 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 30 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 35 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 40 },
-    { type: 'enemyType1', move_interval: 63, spawnSec: 19 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 21 },
-    { type: 'enemyType1', move_interval: 60, spawnSec: 23 },
+    { type: 'enemyType1', move_interval: 60, spawnSec: 1  ,HP: 20},
+    { type: 'enemyType1', move_interval: 60, spawnSec: 4  ,HP: 30},
+    { type: 'enemyType1', move_interval: 45, spawnSec: 7 ,HP: 10},
+    { type: 'enemyType1', move_interval: 60, spawnSec: 10 ,HP: 40},
+    { type: 'enemyType1', move_interval: 120, spawnSec: 15, HP:100},
+    { type: 'enemyType1', move_interval: 60, spawnSec: 20 , HP: 40},
+    { type: 'enemyType1', move_interval: 60, spawnSec: 23 , HP: 50},
+    { type: 'enemyType1', move_interval: 50, spawnSec: 26 , HP: 30},
+    { type: 'enemyType1', move_interval: 60, spawnSec: 30 , HP: 50},
+    { type: 'enemyType1', move_interval: 240, spawnSec: 34 ,HP:450},
+    { type: 'enemyType1', move_interval: 55, spawnSec: 41 , HP: 60},
+    { type: 'enemyType1', move_interval: 60, spawnSec: 43 , HP: 90},
+    { type: 'enemyType1', move_interval: 30, spawnSec: 46 , HP: 50},
+    { type: 'enemyType1', move_interval: 60, spawnSec: 50 ,HP: 50},
+    { type: 'enemyType1', move_interval: 90, spawnSec: 54 ,HP: 400},
+    { type: 'enemyType1', move_interval: 80, spawnSec: 55 ,HP: 50},
+    { type: 'enemyType1', move_interval: 40, spawnSec: 59 ,HP: 80},
+    { type: 'enemyType1', move_interval: 60, spawnSec: 60 ,HP: 90},
+    { type: 'enemyType1', move_interval: 62, spawnSec: 63 ,HP: 100},
+    { type: 'enemyType1', move_interval: 65, spawnSec: 65 ,HP: 400},
+    { type: 'enemyType1', move_interval: 20, spawnSec: 68 ,HP: 10},
+    { type: 'enemyType1', move_interval: 63, spawnSec: 70 ,HP: 110},
+    { type: 'enemyType1', move_interval: 60, spawnSec: 72 ,HP: 120},
+    { type: 'enemyType1', move_interval: 40, spawnSec: 23 ,HP: 70},
+    { type: 'enemyType1', move_interval: 100, spawnSec: 23 ,HP: 1000},
 ];
 let random_speed = 0;
-let random_contents = 7;
+let random_contents = 3;
 
 // 「img/chara1_animation/1,2,3,... .PNG」という要素を16個もつ配列を生成
 const chara_animation_imgs = [
@@ -47,7 +64,7 @@ class Player{
         // this.picts = turretchip;
         // this.pict = new Image();
         // this.pict.src = turretchip[this.holdID];
-        this.resource = 5; //タレット1台1~3のコストを想定して初期値5
+        this.resource = 2; //タレット1台1~3のコストを想定して初期値5
 
         //↓新たに追加しました byまさ
         this.resized_picts = resizeImages(turretchip, map.TILE_SIZE) //画像拡縮の処理
@@ -108,12 +125,12 @@ class Player{
                 "y": Math.floor(this.y/map.tiles[0].height)
             }
 
-            const COST = 1;
+            const COST = turret_cost[this.holdID];
             if(map.map_data[gridc.y][gridc.x]==1 && this.resource >= COST){
                 map.map_data[gridc.y][gridc.x]=2;
                 addTurret(this.holdID,gridc.x,gridc.y,6);
                 this.resource -= COST;
-                console.log(this.resource, 'resource left')
+                //console.log(this.resource, 'resource left')
             }
         }
     }
@@ -171,19 +188,19 @@ class Map{
 }
 
 class Bullet{
-    constructor(x,y,vx,vy,pict,id,bulletSpeed,target){
+    constructor(x,y,vx,vy,bulletchip,id,bulletSpeed,target,damage){
         this.x = x;
         this.y = y;
         // this.pict = new Image();
         // this.pict.src = pict;
         this.vx = vx;
         this.vy = vy;
-        this.damage = 10;
+        this.damage = damage;
         this.away = false;
-
-        this.resized_picts = resizeImages([pict], map.TILE_SIZE*0.3) //pictはstrなので、配列に直して与えました byまさ
-        this.pict = this.resized_picts[0]
         this.id = id;
+
+        this.resized_picts = resizeImages(bulletchip, map.TILE_SIZE*0.3) //pictはstrなので、配列に直して与えました byまさ
+        this.pict = this.resized_picts[this.id];
         this.bulletSpeed = bulletSpeed;
         this.target = target;
     }
@@ -209,9 +226,6 @@ class Bullet{
                 this.vx = (dx/dis)*this.bulletSpeed;
                 this.vy = (dy/dis)*this.bulletSpeed;
             }
-            console.log(this.vx);
-            console.log(this.vy);
-            console.log(this.target);
         }
         catch(e){
         }
@@ -226,12 +240,12 @@ class Bullet{
         for(let enemy of enemies){
             const dx = (enemy.x_canvas + enemy.pict.width/2) - (this.x + this.pict.width/2);
             const dy = (enemy.y_canvas + enemy.pict.height/2) - (this.y + this.pict.height/2);
-            console.log(enemy.pict.width)
+            //console.log(enemy.pict.width)
             const dis = Math.sqrt(dx*dx+dy*dy);
-            if(dis<enemy.pict.width*3/5){
+            if(dis<enemy.pict.width/2){
                 enemy.hp -= this.damage;
                 this.away = true;
-                console.log("hit");
+                //console.log("hit");
             }
         }
     }
@@ -243,7 +257,7 @@ class Turret{
         this.x = x;
         this.y = y;
         this.bulletSpeed = bulletSpeed;
-        this.range = range;
+        this.range = range[this.id];
         // this.pict = new Image();
         // this.pict.src = turretchip[this.id];
         
@@ -257,8 +271,11 @@ class Turret{
         this.animas_idx = 1;
         // 過去書いた処理を使うための代入。
         // this.animas内の要素はどれも大きさ同じなので[0]を使用。
-        this.pict = this.animas[0] 
-
+        this.pict = this.animas[0];
+        let damagechip =[
+            15,10,50
+        ];
+        this.damage = damagechip[this.id];
     }
 
     // 静止画用
@@ -269,6 +286,9 @@ class Turret{
     // アニメーションの番号送りのみを行う（init()内のsetIntervalで使用）
     proceed_animation(){
         this.animas_idx = (this.animas_idx+1) % this.animas.length;
+        if(this.animas_idx === 13){
+            this.aim();
+        }
     }
     // 画像の表示のみ行う。（グローバルのdraw()内で使用）
     draw_animation(){
@@ -300,12 +320,16 @@ class Turret{
 
     shoot(target){
         const dx = target.x_canvas - (this.x+1/2)*this.pict.width;
-        const dy = target.y_canvas - (this.y+1/2)*this.pict.height;
+        const dy = target.y_canvas - (this.y+1/3)*this.pict.height;
         const dis = Math.sqrt(dx*dx+dy*dy);
         const vx = (dx/dis)*this.bulletSpeed;
         const vy = (dy/dis)*this.bulletSpeed;
-        const img = "img/bullet_pink.PNG" // 画像のパスを変えました byまさ
-        let bullet = new Bullet((this.x+1/2)*this.pict.width,(this.y+1/2)*this.pict.height,vx,vy,img,this.id,this.bulletSpeed,target);
+        const img_bulletchip = [
+            'img/bullet_pink.png',
+            'img/bullet_blue.png',
+            'img/bullet_yellow.png'
+        ];
+        let bullet = new Bullet((this.x+1/2)*this.pict.width,(this.y+1/2)*this.pict.height,vx,vy,img_bulletchip,this.id,this.bulletSpeed,target,this.damage);
         bullets.push(bullet);
     }
 }
@@ -347,7 +371,7 @@ class Enemy{
             }
         }
         catch(e){
-            console.log(e.massage);
+            //console.log(e.massage);
         }
 
         //左移動
@@ -359,7 +383,7 @@ class Enemy{
             }
         }
         catch(e){
-            console.log(e.massage);
+            //console.log(e.massage);
         }
 
         //上移動
@@ -371,7 +395,7 @@ class Enemy{
             }
         }
         catch(e){
-            console.log(e.massage);
+            //console.log(e.massage);
         }
 
         //下移動
@@ -383,7 +407,7 @@ class Enemy{
             }
         }
         catch(e){
-            console.log(e.massage);
+            //console.log(e.massage);
         }
     }
 
@@ -496,30 +520,36 @@ function init(){
 
     map = new Map(map_data, img_mapchip);
     player = new Player(img_turretchip);
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,40,500); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
-    enemies.push(enemy);
 }
 
 function addTurret(id,x,y,speed){
     const img_turretchip = [
         'img/dot_chara1.png',
-        'img/dot_chara2.png'
+        'img/dot_chara2.png',
+        'img/dot_chara3.png'
+    ];
+
+    const range_turretchip = [
+        8,
+        5,
+        2
     ];
     // const img_turretchip = [
     //     'img/turret_temp1.png',
     //     'img/turret_temp2.png'
     // ];
-    let turret = new Turret(id,x,y,speed,img_turretchip,5);
+    let turret = new Turret(id,x,y,speed,img_turretchip,range_turretchip);
     turrets.push(turret);
 }
 
-function addEnemy(_move_interval){
+function addEnemy(_move_interval,HP){
     const img_enemychip = ['img/enemy_move_inv.png'];
     _enemy_speed = _move_interval-Math.floor( Math.random() * random_speed);
     if(_enemy_speed <= 0){
         _enemy_speed = 1;
     }
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _enemy_speed,100,500); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _enemy_speed,Math.floor(HP * enemy_level)); //id,x,y,enemychip,speed,HP最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    console.log(enemy.hp)
     enemies.push(enemy);
 }
 
@@ -541,16 +571,13 @@ function update(){
         if(bullet.id === 0){
             bullet.fly();
         }
-        if(bullet.id === 1){
+        if(bullet.id === 1 || bullet.id === 2){
             bullet.homing();
         }
         bullet.hit(enemies);
     }
     removeBullet();
     map.judge_GAMEOVER();
-    for(let turret of turrets){
-        turret.aim();
-    }
 }
 
 function draw(){
@@ -647,10 +674,12 @@ const title_image = new Image();
 title_image.src = 'img/enemy_move_inv.png'
 function gameloop(){
     timer += 1;
-    console.log(game_mode);
+    //console.log(game_mode);
 
     if( game_mode === 'in_title' ){
-        console.log('game_mode: in_title');
+        //console.log('game_mode: in_title');
+        random_speed = 0;
+         random_contents = 3;
 
         graphic.drawImage(title_image,60,0)
         drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
@@ -668,7 +697,7 @@ function gameloop(){
     if( game_mode === 'in_game' ){
         update();
         draw();
-        console.log(wave_mode)
+        //console.log(wave_mode)
 
         drawText(graphic, `resource: ${player.resource}`, CWidth*3/4, CHeight*5/6+50, 20, "rgb(150, 150, 150)");
         if(wave_mode === 'calm'){
@@ -684,24 +713,33 @@ function gameloop(){
 
 
         if(wave_mode === 'battle'){
-            spawn_flag = wave_contents[current_spawn];
+            spawn_flag = wave_contents[current_spawn % 25];
 
             //console.log(wave_contents[wave_count].length)
             if( current_spawn === random_contents && enemies.length === 0){
                 wave_mode = 'calm';
                 wave_count += 1;
                 player.resource += 1;
-                random_contents += Math.floor( Math.random() * 2);
-                random_speed += Math.floor( Math.random() * 20);
+                random_contents += Math.floor( Math.random() * 3);
+                if(random_contents >= 30){
+                    random_contents = 30;
+                }
+                random_speed += Math.floor( Math.random() * 4);
+                enemy_level = enemy_level + 0.25 + Math.random() * 0.1;
                 timer = 0;
             }
 
-            console.log('current_spawn', current_spawn)
+            //console.log('current_spawn', current_spawn)
             if( spawn_flag['spawnSec'] === Math.round(timer/60) && current_spawn < random_contents){
-                addEnemy(spawn_flag['move_interval']);
+                addEnemy(spawn_flag['move_interval'],spawn_flag['HP']);
                 if( current_spawn < random_contents ){
                     current_spawn += 1
                 }
+            }
+
+            if(current_spawn != 0 && current_spawn % 25 === 0){
+                timer = 0;
+                enemy_level *= 2;
             }
         }
     }
