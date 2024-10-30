@@ -446,36 +446,40 @@ class Enemy{
     }
 }
 
-// クラス内だとなぜか読み込み間に合う
 class ResizeStaticImg{
-    constructor(_img_source, _x, _y){
-        this.pre_imgs = [];
-        this.tiles = [];
+    constructor(_img_source, _x, _y, _w, _h){
+        this.pre_img;
+        this.resized_img;
         this.x = _x;
         this.y = _y;
-        this.TILE_SIZE = 64;
-        const NUMBER_CHIP_TYPE = 1
-        for (let i = 0; i < NUMBER_CHIP_TYPE; i++) {
-            this.pre_imgs[i] = new Image();
-            this.pre_imgs[i].src = _img_source; // 画像のソースを設定
-            // 拡縮された画像を保持するためのキャンバス
-            this.tiles[i] = document.createElement('canvas');
-            this.tiles[i].width = this.TILE_SIZE;
-            this.tiles[i].height = this.TILE_SIZE;
-            const tiles_ctx = this.tiles[i].getContext('2d');
-            // キャンバスに描画
-            this.pre_imgs[i].onload = () => {
-                tiles_ctx.drawImage(
-                    this.pre_imgs[i],
-                    0,0,
-                    this.pre_imgs[i].width, this.pre_imgs[i].height, 
-                    0,0, 
-                    this.TILE_SIZE, this.TILE_SIZE);
-            };
+        this.w = _w;
+        this.h = _h;
+        
+        this.pre_img = new Image();
+        this.pre_img.src = _img_source; // 画像のソースを設定
+        // 拡縮された画像を保持するためのキャンバス
+        this.resized_img = document.createElement('canvas');
+        this.resized_img_ctx = this.resized_img.getContext('2d');
+        // const tan = this.pre_imgs[i].height / this.pre_imgs[i].width;
+        // this.tiles_ctx.style.width = "600px";
+        // this.tiles_ctx.style.hegiht = "300px";
+
+        // キャンバスに描画
+        this.pre_img.onload = () => {
+            this.resized_img_ctx.drawImage(
+                this.pre_img,   // 描画obj
+                0,0,                // 切り取り開始座標
+                this.pre_img.width, this.pre_img.height, // 切り取り幅
+                0,0,                // キャンバス上の描画開始座標
+                300, 150); //描画サイズ（not枠）。ここを切れるぎりぎりに調節する。
         }
     }
     draw(){
-        graphic.drawImage(this.tiles[0], this.x, this.y);
+        graphic.drawImage(
+            this.resized_img,
+            this.x,this.y,
+            this.w,this.h); // 表示全体を、絵・枠両方拡大
+            // this.pre_imgs[0].width,this.pre_imgs[0].height);
     }
 }
 
@@ -531,8 +535,6 @@ function init(){
     player = new Player(img_turretchip);
     let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,40,500); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
-
-    // let title_img_obj = new ResizeStaticImg('title.png', 66, 66)
 
 }
 
@@ -717,18 +719,15 @@ function drawText(ctx, text, x, y, size, color) {
 
 
 
-
-// let title_img = resizeImages_async(['title.png'], 500)
-let title_img_obj = new ResizeStaticImg('img/title.png', 66, 66)
+//描画用変数（クラスより上側に配置するとreference error）
+let title_img_obj = new ResizeStaticImg('img/title.png', 0,0, 640, 640*1080/1920); //path,x,y,w
+// let result_img_obj = new ResizeStaticImg('img/resutl.png', 0,0, 640, 640*1080/1920)
 
 function gameloop(){
     timer += 1;
-    console.log(game_mode);
 
     if( game_mode === 'in_title' ){
-        console.log('game_mode: in_title');
-
-        title_img_obj.draw()
+        title_img_obj.draw()    
         drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
         drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 60, "rgb(50, 50, 50)");
         
