@@ -14,7 +14,6 @@ let current_spawn = 0
 let turret_cost = [
     1,2,3
 ];
-let enemy_level = 1.0;
 let wave_count = 0;
 let wave_mode = 'calm';
 let wave_contents = [
@@ -46,6 +45,8 @@ let wave_contents = [
 ];
 let random_speed = 0;
 let random_contents = 3;
+let spawn_speed_level = 0;
+let enemy_level = 1.0;
 
 // 「img/chara1_animation/1,2,3,... .PNG」という要素を16個もつ配列を生成
 const chara_animation_imgs = [
@@ -475,7 +476,7 @@ onload = function(){
     graphic = canvas.getContext("2d");
 
     //フォント読み込み
-    document.fonts.load('10pt"KakomiA"');
+    document.fonts.load('10pt"hanazome"');
 
     //初期化
     init()
@@ -665,7 +666,7 @@ function resizeImages(CHIP, TILE_SIZE) {
 }
 
 function drawText(ctx, text, x, y, size, color) {
-    ctx.font = `${size}px KakomiA`;
+    ctx.font = `${size}px hanazome`;
     ctx.fillStyle = color;
     ctx.textAlign = "center";
     ctx.fillText(text, x, y);
@@ -682,11 +683,13 @@ function gameloop(){
     if( game_mode === 'in_title' ){
         //console.log('game_mode: in_title');
         random_speed = 0;
-         random_contents = 3;
+        random_contents = 3;
+        spawn_speed_level = 0;
+        enemy_level = 1.0;
 
         graphic.drawImage(title_image,60,0)
         drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
-        drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
         
         window.addEventListener('keydown', event => {
             if(event.code === 'Space'){
@@ -724,16 +727,20 @@ function gameloop(){
                 wave_count += 1;
                 player.resource += 1;
                 random_contents += Math.floor( Math.random() * 3);
-                if(random_contents >= 30){
-                    random_contents = 30;
+                spawn_speed_level += Math.floor(Math.floor( Math.random() * 3)/2);
+                if(spawn_speed_level >= 59){
+                    spawn_speed_level = 59;
                 }
                 random_speed += Math.floor( Math.random() * 4);
+                if(random_speed >= 30){
+                    random_speed = 30;
+                }
                 enemy_level = enemy_level + 0.25 + Math.random() * 0.1;
                 timer = 0;
             }
 
             //console.log('current_spawn', current_spawn)
-            if( spawn_flag['spawnSec'] === Math.round(timer/60) && current_spawn < random_contents){
+            if( spawn_flag['spawnSec'] === Math.round(timer/(60 - spawn_speed_level)) && current_spawn < random_contents){
                 addEnemy(spawn_flag['move_interval'],spawn_flag['HP']);
                 if( current_spawn < random_contents ){
                     current_spawn += 1
@@ -743,6 +750,10 @@ function gameloop(){
             if(current_spawn != 0 && current_spawn % 25 === 0){
                 timer = 0;
                 enemy_level *= 2;
+                spawn_speed_level += 2;
+                if(spawn_speed_level >= 59){
+                    spawn_speed_level = 59;
+                }
             }
         }
     }
