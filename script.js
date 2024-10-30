@@ -450,6 +450,9 @@ onload = function(){
     canvas = document.getElementById("game");
     graphic = canvas.getContext("2d");
 
+    //フォント読み込み
+    document.fonts.load('10pt"KakomiA"');
+
     //初期化
     init()
     //入力処理
@@ -635,7 +638,7 @@ function resizeImages(CHIP, TILE_SIZE) {
 }
 
 function drawText(ctx, text, x, y, size, color) {
-    ctx.font = `${size}px Arial`;
+    ctx.font = `${size}px KakomiA`;
     ctx.fillStyle = color;
     ctx.textAlign = "center";
     ctx.fillText(text, x, y);
