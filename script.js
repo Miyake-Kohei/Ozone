@@ -36,6 +36,7 @@ const chara_animation_imgs = [
     Array.from({ length: 16 }, (_, i) => `img/chara2_animation/${i + 1}.PNG`),
     Array.from({ length: 16 }, (_, i) => `img/chara3_animation/${i + 1}.PNG`)
 ];
+let title_img;
 
 
 class Player{
@@ -498,6 +499,8 @@ function init(){
     player = new Player(img_turretchip);
     let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,40,500); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
+
+    title_img = resizeImages(['img/title.png'],500)
 }
 
 function addTurret(id,x,y,speed){
@@ -641,10 +644,13 @@ function drawText(ctx, text, x, y, size, color) {
     ctx.fillText(text, x, y);
 }
 
+let flag = false
+title_img.onload = () => {
+    flag = true
+} 
 
-
-const title_image = new Image();
-title_image.src = 'img/enemy_move_inv.png'
+let title_img_a = new Image();
+title_img_a.src = 'img/enemy_move_inv.png';
 function gameloop(){
     timer += 1;
     console.log(game_mode);
@@ -652,7 +658,10 @@ function gameloop(){
     if( game_mode === 'in_title' ){
         console.log('game_mode: in_title');
 
-        graphic.drawImage(title_image,60,0)
+        graphic.drawImage(title_img_a, 0, 0)
+        if (title_img.complete) {
+            graphic.drawImage(title_img,0,0)
+        }
         drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
         drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 60, "rgb(50, 50, 50)");
         
