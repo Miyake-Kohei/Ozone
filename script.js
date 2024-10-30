@@ -161,10 +161,21 @@ class Map{
             this.dy_judge = Math.abs(emy.y_grid - this.player_base[1]) < 1;
 
             if (this.dx_judge && this.dy_judge) {
-                //_before_enemies = enemies;
                 emy.isDead = true;
                 removeEnemy();
-                //console.log('removeEnemy: ', _before_enemies, '→', enemies);
+                
+                if (game_mode === 'in_game') {
+                    timer = 0;
+                    game_mode = 'in_gameover';
+                }
+                
+                // 拠点にライフを設ける場合の処理
+                // emy.isDead = true;
+                // removeEnemy();
+                // this.player_base_life -= 1
+                // if (this.player_base_life <= 0) {
+                    
+                // }
             }
         }
 
@@ -720,7 +731,6 @@ function drawText(ctx, text, x, y, size, color) {
 }
 
 
-
 // 描画用変数（クラスより上側に配置するとreference error）
 // 「h」の値はいい感じに調節してください。
 let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
@@ -785,7 +795,22 @@ function gameloop(){
         }
     }
 
+    if (game_mode === 'in_gameover') {
+        update();
+        draw();
+        drawText(graphic, "GAME OVER", CWidth/2+3, CHeight/2-3, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "GAME OVER", CWidth/2-3, CHeight/2-3, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "GAME OVER", CWidth/2+3, CHeight/2+3, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "GAME OVER", CWidth/2-3, CHeight/2+3, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "GAME OVER", CWidth/2, CHeight/2, 60, "rgb(250, 200, 200)");
+        if (timer > 3*62.5) {
+            game_mode = 'in_result'
+        }
+    }
     if (game_mode === 'in_result') {
+        
         result_img_obj.draw()
+        drawText(graphic, "Result", CWidth*3/4, CHeight/8, 60, "rgb(100, 100, 100)");
+        
     }
 }
