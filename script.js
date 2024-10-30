@@ -362,16 +362,16 @@ class Enemy{
         this.pict = this.resized_picts[0] //リサイズ画像を代入
 
         // アニメーション用
-        this.resized_animations = resizeImages(enemy_move_imgs[0], map.TILE_SIZE, 'h');
+        this.resized_animations = resizeImages(enemy_move_imgs[0], map.TILE_SIZE, 'h', -5,0);
         this.animas = this.resized_animations;
         this.animas_idx = 1;
         console.log(this.animas[0])
         // this.pict = this.animas[0][0];
     }
 
-    draw(){
-        graphic.drawImage(this.pict, this.x_canvas, this.y_canvas, map.vrble_width, map.vrble_height);
-    }
+    // draw(){
+    //     graphic.drawImage(this.pict, this.x_canvas, this.y_canvas, map.vrble_width, map.vrble_height);
+    // }
 
     // アニメーションの番号送りのみを行う（init()内のsetIntervalで使用）
     proceed_animation(){
@@ -613,7 +613,7 @@ function draw(){
     graphic.fillRect(0,0,canvas.width,canvas.height);
     map.draw();
     for(let enemy of enemies){
-        enemy.draw();
+        // enemy.draw();
         enemy.draw_animation();
     }
     for(let turret of turrets){
@@ -670,7 +670,7 @@ function enemy_animation_proceed(game_mode){
 // actual_drawのブランチで導入
 // グローバル関数として画像リサイズ処理を定義
 // 返り値は画像objの配列なので、画像obj用の変数(this.pictなど)に代入して使えます。
-function resizeImages(CHIP, TILE_SIZE, _inv='') {
+function resizeImages(CHIP, TILE_SIZE, _inv='', _offsetX=0, _offsetY=0) {
     // リサイズ済み画像を格納する配列
     const resizedImages = [];
 
@@ -686,6 +686,7 @@ function resizeImages(CHIP, TILE_SIZE, _inv='') {
 
         // 画像読込完了時の処理
         image.onload = () => {    
+            ctx.translate(_offsetX, _offsetY); //
             // 反転処理の設定
             if (_inv.includes('h')) { // 水平反転
                 ctx.scale(-1, 1);
