@@ -448,38 +448,38 @@ class Enemy{
 
 class ResizeStaticImg{
     constructor(_img_source, _x, _y, _w, _h){
-        this.pre_img;
-        this.resized_img;
+        this.originalImg;
+        this.resizeCanvas;
         this.x = _x;
         this.y = _y;
-        this.w = _w;
-        this.h = _h;
+        this.width = _w;
+        this.height = _h;
         
-        this.pre_img = new Image();
-        this.pre_img.src = _img_source; // 画像のソースを設定
+        this.originalImg = new Image();
+        this.originalImg.src = _img_source; // 画像のソースを設定
         // 拡縮された画像を保持するためのキャンバス
-        this.resized_img = document.createElement('canvas');
-        this.resized_img_ctx = this.resized_img.getContext('2d');
-        // const tan = this.pre_imgs[i].height / this.pre_imgs[i].width;
-        // this.tiles_ctx.style.width = "600px";
-        // this.tiles_ctx.style.hegiht = "300px";
+        this.resizeCanvas = document.createElement('canvas');
+        this.resizeCanvas_ctx = this.resizeCanvas.getContext('2d');
 
         // キャンバスに描画
-        this.pre_img.onload = () => {
-            this.resized_img_ctx.drawImage(
-                this.pre_img,   // 描画obj
+        this.originalImg.onload = () => {
+            this.resizeCanvas.width = 1920;
+            this.resizeCanvas.height = 1080;
+            this.resizeCanvas_ctx.drawImage(
+                this.originalImg,   // 描画obj
                 0,0,                // 切り取り開始座標
-                this.pre_img.width, this.pre_img.height, // 切り取り幅
+                this.originalImg.width, this.originalImg.height, // 切り取り幅
                 0,0,                // キャンバス上の描画開始座標
-                300, 150); //描画サイズ（not枠）。ここを切れるぎりぎりに調節する。
+                this.resizeCanvas.width,this.resizeCanvas.height);
+                // 300, 150); //描画サイズ（not枠）。ここを切れるぎりぎりに調節する。
         }
     }
     draw(){
         graphic.drawImage(
-            this.resized_img,
+            this.resizeCanvas,
             this.x,this.y,
-            this.w,this.h); // 表示全体を、絵・枠両方拡大
-            // this.pre_imgs[0].width,this.pre_imgs[0].height);
+            this.width,this.height); // 表示全体を、絵・枠両方拡大
+            // this.originalImgs[0].width,this.originalImgs[0].height);
     }
 }
 
