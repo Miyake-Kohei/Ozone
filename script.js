@@ -36,7 +36,6 @@ const chara_animation_imgs = [
     Array.from({ length: 16 }, (_, i) => `img/chara2_animation/${i + 1}.PNG`),
     Array.from({ length: 16 }, (_, i) => `img/chara3_animation/${i + 1}.PNG`)
 ];
-let title_img;
 
 
 class Player{
@@ -447,6 +446,39 @@ class Enemy{
     }
 }
 
+// クラス内だとなぜか読み込み間に合う
+class ResizeStaticImg{
+    constructor(_img_source, _x, _y){
+        this.pre_imgs = [];
+        this.tiles = [];
+        this.x = _x;
+        this.y = _y;
+        this.TILE_SIZE = 64;
+        const NUMBER_CHIP_TYPE = 1
+        for (let i = 0; i < NUMBER_CHIP_TYPE; i++) {
+            this.pre_imgs[i] = new Image();
+            this.pre_imgs[i].src = _img_source; // 画像のソースを設定
+            // 拡縮された画像を保持するためのキャンバス
+            this.tiles[i] = document.createElement('canvas');
+            this.tiles[i].width = this.TILE_SIZE;
+            this.tiles[i].height = this.TILE_SIZE;
+            const tiles_ctx = this.tiles[i].getContext('2d');
+            // キャンバスに描画
+            this.pre_imgs[i].onload = () => {
+                tiles_ctx.drawImage(
+                    this.pre_imgs[i],
+                    0,0,
+                    this.pre_imgs[i].width, this.pre_imgs[i].height, 
+                    0,0, 
+                    this.TILE_SIZE, this.TILE_SIZE);
+            };
+        }
+    }
+    draw(){
+        graphic.drawImage(this.tiles[0], this.x, this.y);
+    }
+}
+
 onload = function(){
     canvas = document.getElementById("game");
     graphic = canvas.getContext("2d");
@@ -500,7 +532,8 @@ function init(){
     let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0],img_enemychip,40,500); //最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     enemies.push(enemy);
 
-    title_img = resizeImages(['img/title.png'],500)
+    // let title_img_obj = new ResizeStaticImg('title.png', 66, 66)
+
 }
 
 function addTurret(id,x,y,speed){
@@ -637,6 +670,44 @@ function resizeImages(CHIP, TILE_SIZE) {
     return resizedImages;
 }
 
+// 失敗作（バグります）
+// async function resizeImages_async(CHIP, TILE_SIZE) {
+//     // リサイズ済み画像を格納する配列
+//     const resizedImages = [];
+
+//     for (let i = 0; i < CHIP.length; i++) {
+//         const image = new Image();
+//         image.src = CHIP[i]; // 画像のソースを設定
+
+//         // 拡縮された画像を保持するためのキャンバスを作成
+//         const canvas = document.createElement('canvas');
+//         canvas.width = TILE_SIZE;
+//         canvas.height = TILE_SIZE;
+//         const ctx = canvas.getContext('2d');
+
+//         return new Promise(
+//             (resolve) => {
+//                 image.onload = () => {
+//                     resolve(image);
+//                 };
+//                 ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, TILE_SIZE, TILE_SIZE);
+//                 resizedImages.push(canvas);
+//             }
+//         )
+//         // onloadでキャンバスに描画する
+//         image.onload = () => {
+//             // 元の画像を指定のサイズにリサイズして描画
+//             ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, TILE_SIZE, TILE_SIZE);
+//         };
+
+//         // リサイズされた画像(canvas)を配列に追加
+//         resizedImages.push(canvas);
+//     }
+
+//     // リサイズ済み画像の配列を返す
+//     return resizedImages;
+// }
+
 function drawText(ctx, text, x, y, size, color) {
     ctx.font = `${size}px Arial`;
     ctx.fillStyle = color;
@@ -644,13 +715,12 @@ function drawText(ctx, text, x, y, size, color) {
     ctx.fillText(text, x, y);
 }
 
-let flag = false
-title_img.onload = () => {
-    flag = true
-} 
 
-let title_img_a = new Image();
-title_img_a.src = 'img/enemy_move_inv.png';
+
+
+// let title_img = resizeImages_async(['title.png'], 500)
+let title_img_obj = new ResizeStaticImg('img/title.png', 66, 66)
+
 function gameloop(){
     timer += 1;
     console.log(game_mode);
@@ -658,10 +728,7 @@ function gameloop(){
     if( game_mode === 'in_title' ){
         console.log('game_mode: in_title');
 
-        graphic.drawImage(title_img_a, 0, 0)
-        if (title_img.complete) {
-            graphic.drawImage(title_img,0,0)
-        }
+        title_img_obj.draw()
         drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
         drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 60, "rgb(50, 50, 50)");
         
