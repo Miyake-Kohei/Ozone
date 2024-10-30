@@ -164,7 +164,7 @@ class Map{
 }
 
 class Bullet{
-    constructor(x,y,vx,vy,pict,id,bulletSpeed,target){
+    constructor(x,y,vx,vy,bulletchip,id,bulletSpeed,target){
         this.x = x;
         this.y = y;
         // this.pict = new Image();
@@ -173,10 +173,10 @@ class Bullet{
         this.vy = vy;
         this.damage = 10;
         this.away = false;
-
-        this.resized_picts = resizeImages([pict], map.TILE_SIZE*0.3) //pictはstrなので、配列に直して与えました byまさ
-        this.pict = this.resized_picts[0]
         this.id = id;
+
+        this.resized_picts = resizeImages(bulletchip, map.TILE_SIZE*0.3) //pictはstrなので、配列に直して与えました byまさ
+        this.pict = this.resized_picts[this.id];
         this.bulletSpeed = bulletSpeed;
         this.target = target;
     }
@@ -240,8 +240,8 @@ class Turret{
         // this.pict = new Image();
         // this.pict.src = turretchip[this.id];
  
-        this.resized_picts = resizeImages(turretchip, map.TILE_SIZE) // 画像拡縮の処理
-        this.pict = this.resized_picts[this.id] //this.idでどのタレットの画像を引くか決める
+        this.resized_picts = resizeImages(turretchip, map.TILE_SIZE); // 画像拡縮の処理
+        this.pict = this.resized_picts[this.id]; //this.idでどのタレットの画像を引くか決める
     }
 
     draw(){
@@ -274,8 +274,12 @@ class Turret{
         const dis = Math.sqrt(dx*dx+dy*dy);
         const vx = (dx/dis)*this.bulletSpeed;
         const vy = (dy/dis)*this.bulletSpeed;
-        const img = "img/bullet_pink.PNG" // 画像のパスを変えました byまさ
-        let bullet = new Bullet((this.x+1/2)*this.pict.width,(this.y+1/2)*this.pict.height,vx,vy,img,this.id,this.bulletSpeed,target);
+        const img_bulletchip = [
+            'img/bullet_pink.png',
+            'img/bullet_blue.png',
+            'img/bullet_yellow.png'
+        ];
+        let bullet = new Bullet((this.x+1/2)*this.pict.width,(this.y+1/2)*this.pict.height,vx,vy,img_bulletchip,this.id,this.bulletSpeed,target);
         bullets.push(bullet);
     }
 }
@@ -455,8 +459,10 @@ function init(){
     
     const img_turretchip = [
         'img/dot_chara1.png',
-        'img/dot_chara2.png'
-    ]
+        'img/dot_chara2.png',
+        'img/dot_chara3.png'
+    ];
+
     // const img_turretchip = [
     //     'img/turret_temp1.png',
     //     'img/turret_temp2.png'
@@ -471,7 +477,8 @@ function init(){
 function addTurret(id,x,y,speed){
     const img_turretchip = [
         'img/dot_chara1.png',
-        'img/dot_chara2.png'
+        'img/dot_chara2.png',
+        'img/dot_chara3.png'
     ];
     // const img_turretchip = [
     //     'img/turret_temp1.png',
