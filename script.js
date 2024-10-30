@@ -719,9 +719,11 @@ function drawText(ctx, text, x, y, size, color) {
 
 
 
-//描画用変数（クラスより上側に配置するとreference error）
-let title_img_obj = new ResizeStaticImg('img/title.png', 0,0, 640, 640*1080/1920); //path,x,y,w
-// let result_img_obj = new ResizeStaticImg('img/resutl.png', 0,0, 640, 640*1080/1920)
+// 描画用変数（クラスより上側に配置するとreference error）
+// 640*1080/1920 = 360
+let title_img_obj = new ResizeStaticImg('img/title.png', 0,0, 640,640*1500/1920); //path,x,y,w,h
+// let title_img_obj = new ResizeStaticImg('img/result.png', 0,60, 640,64050080/1920); //path,x,y,w,h
+// let result_img_obj = new ResizeStaticImg('img/result.png', 0,180, 640,360)
 
 function gameloop(){
     timer += 1;
