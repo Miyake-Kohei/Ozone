@@ -576,6 +576,7 @@ class ClickableButton {
         this.y = 0;
         this.w = 0;
         this.h = 0;
+        this.allow_mode = _allow_mode;
         this.callback = _callback; // クリック時に実行される処理（関数）
         document.addEventListener("mousedown", this.handleMouseDown.bind(this));
 
@@ -614,7 +615,8 @@ class ClickableButton {
         graphic.strokeStyle = 'red'; // 枠線の色
         graphic.lineWidth = 3; // 枠線の太さ
         graphic.strokeRect(x0, y0, w0, h0);
-        console.log(this.x,this.y,this.w,this.h);
+
+        // console.log(this.x,this.y,this.w,this.h);
     }
 
     // 範囲内のクリックか判定するメソッド
@@ -631,10 +633,10 @@ class ClickableButton {
         const clickX = event.offsetX; //offsetX...canvas自体の左上を基準とした座標
         const clickY = event.offsetY;
         // クリック位置が範囲内ならコールバックを実行
-        // if (game_mode === allow_mode && this.isWithinBounds(clickX, clickY)) {
-        if (this.isWithinBounds(clickX, clickY)) {
+        // game_mo...の条件がないと意図しないgame_mode上で処理が働いてしまう
+        if (game_mode === this.allow_mode && this.isWithinBounds(clickX, clickY)) {
+        // if (this.isWithinBounds(clickX, clickY)) {
             this.callback();
-            console.log('clickablebutton was clicked')
         }
     }
 }
@@ -919,7 +921,13 @@ let logo_img_obj = new ResizeStaticImg('img/title_logo.png') // 1280*1280
 // let button_start_img_obj = new ResizeStaticImg('img/buttons/button_start.png') //w=700 h=300
 // let button_setting_img_obj = new ResizeStaticImg('img/buttons/button_setting.png') //w=700 h=300
 // let button_exit_img_obj = new ResizeStaticImg('img/buttons/button_exit.png') //w=700 h=300
-let button_start = new ClickableButton('img/buttons/button_start.png', 'in_title', () => {
+let button_start_title = new ClickableButton('img/buttons/button_start.png', 'in_title', () => {
+    console.log('testtest')
+})
+let button_setting = new ClickableButton('img/buttons/button_setting.png', 'in_title', () => {
+    console.log('testtest')
+})
+let button_exit = new ClickableButton('img/buttons/button_exit.png', 'in_title', () => {
     console.log('testtest')
 })
 
@@ -946,26 +954,23 @@ function gameloop(){
         logo_s = 300
         logo_img_obj.draw2(logo_x,logo_y,logo_s,logo_s);
         
-        button_start.draw_and_define(10,400,BUTTON_W,BUTTON_H);
-        // for (let i=0; i<3; i++){
-        //     HTML_W = 500
-        //     button_start_img_obj.draw2(i*HTML_W/3, 450, BUTTON_W, BUTTON_H);
-        // }
+        // const btn_title_h = 400
+        // const btn_title_cx1 = HTML_WIDTH*1/6-BUTTON_W/2
+        // const btn_title_cx2 = HTML_WIDTH*3/6-BUTTON_W/2
+        // const btn_title_cx3 = HTML_WIDTH*5/6-BUTTON_W/2
+        // button_exit.draw_and_define(btn_title_cx1, btn_title_h ,BUTTON_W,BUTTON_H);
+        // button_setting.draw_and_define(btn_title_cx2, btn_title_h ,BUTTON_W,BUTTON_H);
+        // button_start_title.draw_and_define(btn_title_cx3, btn_title_h ,BUTTON_W,BUTTON_H);
         
-        // button_start_img_obj.draw2(0, 450, BUTTON_W, BUTTON_H);
-        // button_start_img_obj.draw2(0, 450, BUTTON_W, BUTTON_H);
-
-        // 一度だけ実行したい→ループ外に位置させる→ループ内とループ外それぞれを描かないといけない。
-        // 表示と処理を関連付けたい
-        // document.addEventListener('mouseup', e => {
-        //     // console.log('X', e.offsetX)
-        //     // console.log('Y', e.offsetY)
-        //     if(logo_x < e.offsetX && e.offsetX < logo_x+logo_s){
-        //         console.log('ok')
-
-        //     }
-        // }, {once:true});
-
+        { //{}内で定義された変数は外部からアクセスできない（即時実行関数式）
+            const CH = 428
+            const CX1 = HTML_WIDTH*1/6-BUTTON_W/2
+            const CX2 = HTML_WIDTH*3/6-BUTTON_W/2
+            const CX3 = HTML_WIDTH*5/6-BUTTON_W/2
+            button_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H);
+            button_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H);
+            button_start_title.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H);
+        }
 
         window.addEventListener('keydown', event => {
             if(event.code === 'Space'){
