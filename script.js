@@ -559,21 +559,29 @@ class ResizeStaticImg{
             this.width,this.height); // 表示全体を、絵・枠両方拡大
             // this.originalImgs[0].width,this.originalImgs[0].height);
     }
+    draw2(x0,y0,w0,h0){
+        graphic.drawImage(
+            this.resizeCanvas,
+            x0,y0,
+            w0,h0); // 表示全体を、絵・枠両方拡大
+            // this.originalImgs[0].width,this.originalImgs[0].height);
+    }
 }
 
+// 要グローバル変数：game_mode
 class ClickableArea {
-    constructor(x, y, width, height, _game_mode, _allow_mode ,callback) {
+    constructor(x, y, width, height, callback) {
         // クリック範囲を指定する
         this.x = x;           // 範囲の左上のx座標
         this.y = y;           // 範囲の左上のy座標
         this.width = width;   // 範囲の幅
         this.height = height; // 範囲の高さ
-        this.game_mode = _game_mode;
-        this.allow_mode = _allow_mode;
         this.callback = callback; // クリック時に実行される処理（関数）
         console.log(this.game_mode, 'sadfa')
-        console.log(this.allow_mode, 'sadfa')
+        console.log(this.allow_mode, 'sadfa')        
+    }
 
+    set(){
         // マウスダウンイベントを設定する
         document.addEventListener("mousedown", this.handleMouseDown.bind(this));
     }
@@ -592,10 +600,14 @@ class ClickableArea {
         const clickX = event.clientX;
         const clickY = event.clientY;
         // クリック位置が範囲内ならコールバックを実行
-        if (this.game_mode === '' && this.isWithinBounds(clickX, clickY)) {
+        if (game_mode === 'in_title' && this.isWithinBounds(clickX, clickY)) {
             this.callback();
         }
     }
+}
+
+function button(x, y, w, h, obj, callback){
+
 }
 
 
@@ -736,8 +748,8 @@ function keydown(e){
 
 function mousedown(e){
     player.grab();
-    console.log('x', e.pageX)
-    console.log('y', e.pageY)
+    console.log('x', e.offsetX)
+    console.log('y', e.offsetY)
 }
 
 function mouseup(e){
@@ -868,12 +880,15 @@ function drawText(ctx, text, x, y, size, color) {
 
 // 描画用変数（クラスより上側に配置するとreference error）
 // 「h」の値はいい感じに調節してください。
-let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
+const BUTTON_W = 150
+const BUTTON_H = 300*BUTTON_W/700
+console.log({BUTTON_H})
+let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT-100); //path,x,y,w,h
 let result_img_obj = new ResizeStaticImg('img/result.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
-let click_obj = new ClickableArea(0,0,100,100,game_mode,'in_title', () => {
-    console.log("alow kansuu ok!");
-});
-
+let logo_img_obj = new ResizeStaticImg('img/title_logo.png') // 1280*1280
+let button_start_img_obj = new ResizeStaticImg('img/buttons/button_start.png') //w=700 h=300
+let button_setting_img_obj = new ResizeStaticImg('img/buttons/button_setting.png') //w=700 h=300
+let button_exit_img_obj = new ResizeStaticImg('img/buttons/button_exit.png') //w=700 h=300
 
 function gameloop(){
     timer += 1;
@@ -890,10 +905,12 @@ function gameloop(){
         animation_time = 0;
         change_gamespeed_time = 0;
 
-        title_img_obj.draw()    
-        drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
-        drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
-        
+        title_img_obj.draw()
+        button_start_img_obj.draw2(0, 450, BUTTON_W, BUTTON_H);
+        // drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
+        // drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
+        logo_img_obj.draw2(37-20,8-20+2*Math.sin(timer/20),300,300);
+
         window.addEventListener('keydown', event => {
             if(event.code === 'Space'){
                 if( game_mode === 'in_title' ){
