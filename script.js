@@ -4,6 +4,7 @@ let enemies_resize = [];
 let turrets = [];
 let bullets = [];
 let game_mode = 'in_title';
+let title_mode = 'main'; //新規byまさ
 let map,player;
 let pointer = {
     "x":0,
@@ -784,8 +785,8 @@ function keydown(e){
 
 function mousedown(e){
     player.grab();
-    console.log('x', e.offsetX)
-    console.log('y', e.offsetY)
+    // console.log('x', e.offsetX)
+    // console.log('y', e.offsetY)
 }
 
 function mouseup(e){
@@ -878,7 +879,6 @@ function drawText(ctx, text, x, y, size, color) {
 
 
 // 描画用変数（クラスより上側に配置するとreference error）
-// 「h」の値はいい感じに調節してください。
 const BUTTON_W = 150
 const BUTTON_H = 300*BUTTON_W/700
 console.log({BUTTON_H})
@@ -886,6 +886,7 @@ let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_
 let result_img_obj = new ResizeStaticImg('img/result.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
 let logo_img_obj = new ResizeStaticImg('img/title_logo.png') // 1280*1280
 
+// 「ボタン」オブジェ
 let btn_title_exit = new ClickableButton('img/buttons/button_exit.png', 'in_title');
 let btn_title_setting = new ClickableButton('img/buttons/button_setting.png', 'in_title');
 let btn_title_start = new ClickableButton('img/buttons/button_start.png', 'in_title');
@@ -909,50 +910,82 @@ function gameloop(){
         animation_time = 0;
         change_gamespeed_time = 0;
 
+        //描画の処理
+        //下枠
+        graphic.fillStyle = "rgba(" + [50,50,50] + ")";
+        graphic.fillRect(0,0,canvas.width,canvas.height);
+        // タイトル
         title_img_obj.draw()
-        // drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
-        // drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
+        // ロゴ
         logo_x = 17
         logo_y = -10+2*Math.sin(timer/20)
         logo_s = 300
         logo_img_obj.draw2(logo_x,logo_y,logo_s,logo_s);
         
-        // タイトルのボタン群
-        { //{}で囲むと、この中で定義された変数は外部からアクセスできない（即時実行関数式）
-            const CH = 428
-            const CX1 = HTML_WIDTH*1/6-BUTTON_W/2
-            const CX2 = HTML_WIDTH*3/6-BUTTON_W/2
-            const CX3 = HTML_WIDTH*5/6-BUTTON_W/2
-            btn_title_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H, ()=>{
-                console.log('おわる');
-                window.location.reload();
-            });
-            btn_title_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H, ()=>{
-                console.log('せってい');
-            });
-            btn_title_start.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
-                console.log('はじめる')
-                graphic.clearRect(0,0, CWidth, CHeight);
-                game_mode = 'in_game';
-                gamespeed = 1;
-                change_gamespeed_flag = 1;
-                timer = 0;
-                wave_count = 1;
-            });
-        }
-
-        window.addEventListener('keydown', event => {
-            if(event.code === 'Space'){
-                if( game_mode === 'in_title' ){
+        // drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
+        // drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
+        
+        if (title_mode === 'main'){
+            // タイトルのボタン群
+            { //{}で囲むと、この中で定義された変数は外部からアクセスできない（即時実行関数式）
+                const CH = 428
+                const CX1 = HTML_WIDTH*1/6-BUTTON_W/2
+                const CX2 = HTML_WIDTH*3/6-BUTTON_W/2
+                const CX3 = HTML_WIDTH*5/6-BUTTON_W/2
+                btn_title_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H, ()=>{
+                    console.log('おわる');
+                    window.location.reload(); //ブラウザの再読み込み
+                });
+                btn_title_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H, ()=>{
+                    console.log('せってい');
+                    title_mode = 'setting'
+                });
+                btn_title_start.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
+                    console.log('はじめる');
                     graphic.clearRect(0,0, CWidth, CHeight);
                     game_mode = 'in_game';
                     gamespeed = 1;
                     change_gamespeed_flag = 1;
                     timer = 0;
                     wave_count = 1;
-                }
+                });
             }
-        });
+
+            window.addEventListener('keydown', event => {
+                if(event.code === 'Space'){
+                    if( game_mode === 'in_title' ){
+                        graphic.clearRect(0,0, CWidth, CHeight);
+                        game_mode = 'in_game';
+                        gamespeed = 1;
+                        change_gamespeed_flag = 1;
+                        timer = 0;
+                        wave_count = 1;
+                    }
+                }
+            });
+        }
+
+        if (title_mode === 'setting'){
+            //半透明(透明度70%)の暗い四角を画面全体に表示
+            graphic.beginPath();
+            graphic.fillStyle = "rgba(" + [0, 0, 0, 0.7] + ")";
+            graphic.fillRect(0, 0, CWidth, CHeight);  
+            
+            ///ボタン無効化処理
+            btn_title_exit.draw_and_define(0,0,0,0, ()=>{});
+            btn_title_setting.draw_and_define(0,0,0,0, ()=>{});
+            btn_title_start.draw_and_define(0,0,0,0, ()=>{});
+            
+            { //{}で囲むと、この中で定義された変数は外部からアクセスできない（即時実行関数式）
+                const CH = 428
+                const CX2 = HTML_WIDTH*3/6-BUTTON_W/2
+                btn_title_exit.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H, ()=>{
+                    console.log('おわる');
+                    title_mode = 'main';
+                });
+            }
+
+        }      
     }
 
     if( game_mode === 'in_game' ){
