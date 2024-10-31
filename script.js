@@ -64,7 +64,7 @@ const enemy_move_imgs = {
     green: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_green_move/${i + 1}.PNG`),
     blue: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_blue_move/${i + 1}.PNG`),
     orange: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_orange_move/${i + 1}.PNG`),
-    purple: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_purple_move/${i + 1}.PNG`),
+    pink: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_pink_move/${i + 1}.PNG`),
     gold: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_gold_move/${i + 1}.PNG`)
 };
 
