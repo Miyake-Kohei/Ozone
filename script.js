@@ -4,7 +4,7 @@ let enemies_resize = [];
 let turrets = [];
 let bullets = [];
 let game_mode = 'in_title';
-let title_mode = 'main'; //新規byまさ
+let title_mode = 'main';
 let map,player;
 let pointer = {
     "x":0,
@@ -1104,6 +1104,11 @@ function gameloop(){
         
         result_img_obj.draw()
         drawText(graphic, "Result", CWidth*3/4, CHeight/8, 60, "rgb(100, 100, 100)");
+
+        drawText(graphic, `到達したwave：${wave_count}`, CWidth*3/4, CHeight/8+75, 20, "rgb(100, 100, 100)");
+        drawText(graphic, `倒した敵の数：`, CWidth*3/4, CHeight/8+125, 20, "rgb(100, 100, 100)");
+        drawText(graphic, `与えたダメージ：`, CWidth*3/4, CHeight/8+175, 20, "rgb(100, 100, 100)");
+        drawText(graphic, `経過時間(game内)：`, CWidth*3/4, CHeight/8+225, 20, "rgb(100, 100, 100)");
         // 戻るボタン
         {//即時実行関数
             const CH = 428
