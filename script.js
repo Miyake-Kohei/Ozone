@@ -561,6 +561,44 @@ class ResizeStaticImg{
     }
 }
 
+class ClickableArea {
+    constructor(x, y, width, height, _game_mode, _allow_mode ,callback) {
+        // クリック範囲を指定する
+        this.x = x;           // 範囲の左上のx座標
+        this.y = y;           // 範囲の左上のy座標
+        this.width = width;   // 範囲の幅
+        this.height = height; // 範囲の高さ
+        this.game_mode = _game_mode;
+        this.allow_mode = _allow_mode;
+        this.callback = callback; // クリック時に実行される処理（関数）
+        console.log(this.game_mode, 'sadfa')
+        console.log(this.allow_mode, 'sadfa')
+
+        // マウスダウンイベントを設定する
+        document.addEventListener("mousedown", this.handleMouseDown.bind(this));
+    }
+
+    // 範囲内のクリックか判定するメソッド
+    isWithinBounds(clickX, clickY) {
+        return (
+            clickX >= this.x &&
+            clickX <= this.x + this.width &&
+            clickY >= this.y &&
+            clickY <= this.y + this.height
+        );
+    }
+    // マウスダウン時の処理
+    handleMouseDown(event) {
+        const clickX = event.clientX;
+        const clickY = event.clientY;
+        // クリック位置が範囲内ならコールバックを実行
+        if (this.game_mode === '' && this.isWithinBounds(clickX, clickY)) {
+            this.callback();
+        }
+    }
+}
+
+
 onload = function(){
     canvas = document.getElementById("game");
     graphic = canvas.getContext("2d");
@@ -832,6 +870,9 @@ function drawText(ctx, text, x, y, size, color) {
 // 「h」の値はいい感じに調節してください。
 let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
 let result_img_obj = new ResizeStaticImg('img/result.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
+let click_obj = new ClickableArea(0,0,100,100,game_mode,'in_title', () => {
+    console.log("alow kansuu ok!");
+});
 
 
 function gameloop(){
