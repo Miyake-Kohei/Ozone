@@ -9,8 +9,12 @@ let pointer = {
     "x":0,
     "y":0
 }
+let gamespeed = 1;
 let timer = 0;
-let current_spawn = 0
+let animation_time = 0;
+let current_spawn = 0;
+let change_gamespeed_flag = 0;
+let change_gamespeed_time = 0;
 let turret_cost = [
     1,2,3
 ];
@@ -287,7 +291,7 @@ class Turret{
         // this.animas内の要素はどれも大きさ同じなので[0]を使用。
         this.pict = this.animas[0];
         let damagechip =[
-            15,10,50
+            17,11,57
         ];
         this.damage = damagechip[this.id];
     }
@@ -366,6 +370,11 @@ class Enemy{
         this.x_grid_before = null;
         this.y_grid_before = null;
         this.hp = HP;
+        this.x_candidate = 0;
+        this.y_candidate = 0;
+        this.move_count=0;
+        this.x_move = 0;
+        this.y_move = 0;
 
         this.resized_picts = resizeImages(enemychip, map.TILE_SIZE) //画像拡縮の処理
         this.pict = this.resized_picts[0] //リサイズ画像を代入
@@ -425,48 +434,50 @@ class Enemy{
         }
     }
 
-    animation_move(x_move,y_move,x_candidate,y_candidate){
-        let i=0;
+    animation_move(){
         this.flag_move = 1;
-        let interval = setInterval(() => {
-            this.x_canvas = this.x_canvas + x_move * this.frame;
-            this.y_canvas = this.y_canvas + y_move * this.frame;
-            i++;
-            if(i > this.speed/2){
-                this.x_grid = x_candidate;
-                this.y_grid = y_candidate;
-            }
-            if(i === this.speed){
-                this.flag_move = 0;
-                clearInterval(interval);
-            }
-        }, 16);
+        this.x_canvas = this.x_canvas + this.x_move * this.frame;
+        this.y_canvas = this.y_canvas + this.y_move * this.frame;
+        this.move_count++;
+        if(this.move_count > this.speed/2){
+            this.x_grid = this.x_candidate;
+            this.y_grid = this.y_candidate;
+        }
+        if(this.move_count === this.speed){
+            this.flag_move = 0;
+        }
     }
 
     move(){
         if(this.flag_move === 1){
+            this.animation_move(this.x_candidate-this.x_grid,this.y_candidate-this.y_grid);
             return 0;
         }
-        let x_candidate = this.x_grid;
-        let y_candidate = this.y_grid;
+
+        this.x_candidate = this.x_grid;
+        this.y_candidate = this.y_grid;
         let command;
         command = this.search_move();
 
         switch(command){
-            case 'R' :x_candidate++;//右移動
+            case 'R' :this.x_candidate++;//右移動
                     break;
-            case 'L' :x_candidate--;//左移動
+            case 'L' :this.x_candidate--;//左移動
                     break;
-            case 'U' :y_candidate--;//上移動
+            case 'U' :this.y_candidate--;//上移動
                     break;
-            case 'D' :y_candidate++;//下移動
+            case 'D' :this.y_candidate++;//下移動
                     break;
         }
 
-        if(map.map_data[y_candidate][x_candidate] === 0){
-            this.animation_move(x_candidate-this.x_grid,y_candidate-this.y_grid,x_candidate,y_candidate);
+        if(map.map_data[this.y_candidate][this.x_candidate] === 0){
+            this.move_count=0;
+            this.x_move = this.x_candidate-this.x_grid;
+            this.y_move = this.y_candidate-this.y_grid;
             this.x_grid_before = this.x_grid;
             this.y_grid_before = this.y_grid;
+            this.animation_move();
+            
             //this.x_grid = x_candidate;
             //this.y_grid = y_candidate;
             //console.log(this.x_grid_before);
@@ -537,8 +548,7 @@ onload = function(){
     document.onmousedown = mousedown;
     document.onmouseup = mouseup;
 
-    setInterval("turret_animation_proceed(game_mode)", 70) // アニメーションの番号送り専用
-    setInterval("gameloop()",16)
+    setTimeout("gameloop()",16 / gamespeed)
 }
 
 function init(){
@@ -769,6 +779,8 @@ let result_img_obj = new ResizeStaticImg('img/result.png', 0, 0, HTML_WIDTH, HTM
 
 function gameloop(){
     timer += 1;
+    animation_time += 1;
+    change_gamespeed_time += 1;
     //console.log(game_mode);
 
     if( game_mode === 'in_title' ){
@@ -777,6 +789,8 @@ function gameloop(){
         random_contents = 3;
         spawn_speed_level = 0;
         enemy_level = 1.0;
+        animation_time = 0;
+        change_gamespeed_time = 0;
 
         title_img_obj.draw()    
         drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
@@ -784,9 +798,14 @@ function gameloop(){
         
         window.addEventListener('keydown', event => {
             if(event.code === 'Space'){
-                graphic.clearRect(0,0, CWidth, CHeight);
-                game_mode = 'in_game';
-                timer = 0          
+                if( game_mode === 'in_title' ){
+                    graphic.clearRect(0,0, CWidth, CHeight);
+                    game_mode = 'in_game';
+                    gamespeed = 1;
+                    change_gamespeed_flag = 1;
+                    timer = 0;
+                    wave_count = 1;
+                }
             }
         });
     }
@@ -796,20 +815,46 @@ function gameloop(){
         draw();
         //console.log(wave_mode)
 
-        drawText(graphic, `resource: ${player.resource}`, CWidth*3/4, CHeight*5/6+50, 20, "rgb(150, 150, 150)");
-        if(wave_mode === 'calm'){
-            current_spawn = 0;
-            window.addEventListener('keydown', event => {
-                if(event.code === 'Space'){
+        window.addEventListener('keydown', event => {
+            if(event.code === 'Space'){
+                if(wave_mode === 'calm'){
                     wave_mode = 'battle';
                     timer = 0;
                 }
-            });
+            }
+
+            if(event.key === '1' && change_gamespeed_flag === 1){
+                gamespeed = 1;
+                change_gamespeed_flag = 0;
+                change_gamespeed_time = 0;
+
+            }
+
+            if(event.key === '2' && change_gamespeed_flag === 1){
+                gamespeed = 2;
+                change_gamespeed_flag = 0;
+                change_gamespeed_time = 0;
+            }
+
+            if(event.key === '4' && change_gamespeed_flag === 1){
+                gamespeed = 4;
+                change_gamespeed_flag = 0;
+                change_gamespeed_time = 0;
+            }
+        });
+
+
+
+        drawText(graphic, `x ${gamespeed}`, CWidth*11/12, CHeight*5/6+70, 20, "rgb(150, 150, 150)");
+        drawText(graphic, `resource: ${player.resource}`, CWidth*3/4, CHeight*5/6+50, 20, "rgb(150, 150, 150)");
+        if(wave_mode === 'calm'){
+            current_spawn = 0;
             drawText(graphic, "Press [SPACE] to wave", CWidth*3/4, CHeight*5/6+20, 20, "rgb(150, 150, 150)");
         } 
 
 
         if(wave_mode === 'battle'){
+            drawText(graphic, `wave:  ${wave_count}`, CWidth*3/4, CHeight*5/6+20, 20, "rgb(150, 150, 150)");
             spawn_flag = wave_contents[current_spawn % 25];
 
             //console.log(wave_contents[wave_count].length)
@@ -824,9 +869,9 @@ function gameloop(){
                 }
                 random_speed += Math.floor( Math.random() * 4);
                 if(random_speed >= 30){
-                    random_speed = 30;
+                    random_speed = 30; // 速くなりすぎないように
                 }
-                enemy_level = enemy_level + 0.2 + Math.random() * 0.1;
+                enemy_level = enemy_level + 0.2 + Math.random() * 0.1; //HP倍率の上昇
                 timer = 0;
             }
 
@@ -840,7 +885,7 @@ function gameloop(){
 
             if(current_spawn != 0 && current_spawn % 25 === 0){
                 timer = 0;
-                enemy_level *= 2;
+                enemy_level *= 1.5;
                 spawn_speed_level += 2;
                 if(spawn_speed_level >= 59){
                     spawn_speed_level = 59;
@@ -852,6 +897,7 @@ function gameloop(){
     if (game_mode === 'in_gameover') {
         update();
         draw();
+        gamespeed = 1;
         drawText(graphic, "GAME OVER", CWidth/2+3, CHeight/2-3, 60, "rgb(50, 50, 50)");
         drawText(graphic, "GAME OVER", CWidth/2-3, CHeight/2-3, 60, "rgb(50, 50, 50)");
         drawText(graphic, "GAME OVER", CWidth/2+3, CHeight/2+3, 60, "rgb(50, 50, 50)");
@@ -867,4 +913,19 @@ function gameloop(){
         drawText(graphic, "Result", CWidth*3/4, CHeight/8, 60, "rgb(100, 100, 100)");
         
     }
+
+
+    if(animation_time % 5 === 0){
+        turret_animation_proceed(game_mode); // アニメーションの番号送り専用
+        animation_time = 0;
+    }
+
+
+    if(change_gamespeed_time % 10 === 0){
+        change_gamespeed_flag = 1; // アニメーションの番号送り専用
+        change_gamespeed_time = 0;
+    }
+
+    setTimeout("gameloop()", 16 / gamespeed)
+
 }
