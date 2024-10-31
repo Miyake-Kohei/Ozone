@@ -569,30 +569,54 @@ class ResizeStaticImg{
 }
 
 // 要グローバル変数：game_mode
-class ClickableArea {
-    constructor(x, y, width, height, callback) {
-        // クリック範囲を指定する
-        this.x = x;           // 範囲の左上のx座標
-        this.y = y;           // 範囲の左上のy座標
-        this.width = width;   // 範囲の幅
-        this.height = height; // 範囲の高さ
-        this.callback = callback; // クリック時に実行される処理（関数）
-        console.log(this.game_mode, 'sadfa')
-        console.log(this.allow_mode, 'sadfa')        
-    }
-
-    set(){
-        // マウスダウンイベントを設定する
+class ClickableButton {
+    constructor(_img_path, _allow_mode, _callback) {
+        // システム側：クリック範囲を指定する
+        this.x = 0;
+        this.y = 0;
+        this.w = 0;
+        this.h = 0;
+        this.callback = _callback; // クリック時に実行される処理（関数）
         document.addEventListener("mousedown", this.handleMouseDown.bind(this));
+
+        // 描画側：リサイズして描画
+        const originalImg = new Image();
+        originalImg.src = _img_path;
+        this.resizeCanvas = document.createElement('canvas');
+        this.resizeCanvas_ctx = this.resizeCanvas.getContext('2d');
+        
+        this.originalImg.onload = () => {
+            this.resizeCanvas.width = 1920;
+            this.resizeCanvas.height = 1080;
+            this.resizeCanvas_ctx.drawImage(
+                this.originalImg,   // 描画obj
+                0,0,                // 切り取り開始座標
+                this.originalImg.width, this.originalImg.height, // 切り取り幅
+                0,0,                // キャンバス上の描画開始座標
+                this.resizeCanvas.width,this.resizeCanvas.height);
+                // 300, 150); //描画サイズ（not枠）。ここを切れるぎりぎりに調節する。
+        }
+    }
+    
+    draw_and_define(x0,y0,w0,h0){
+        this.x = x0;
+        this.y = y0;
+        this.w = w0;
+        this.h = h0;
+        graphic.drawImage(
+            this.resizeCanvas,
+            x0,y0,
+            w0,h0); // 表示全体を、絵・枠両方拡大
+        console.log(this.x,this.y,this.w,this.h);
     }
 
     // 範囲内のクリックか判定するメソッド
     isWithinBounds(clickX, clickY) {
         return (
             clickX >= this.x &&
-            clickX <= this.x + this.width &&
+            clickX <= this.x + this.w &&
             clickY >= this.y &&
-            clickY <= this.y + this.height
+            clickY <= this.y + this.h
         );
     }
     // マウスダウン時の処理
@@ -600,15 +624,12 @@ class ClickableArea {
         const clickX = event.clientX;
         const clickY = event.clientY;
         // クリック位置が範囲内ならコールバックを実行
-        if (game_mode === 'in_title' && this.isWithinBounds(clickX, clickY)) {
+        if (game_mode === allow_mode && this.isWithinBounds(clickX, clickY)) {
             this.callback();
         }
     }
 }
 
-function button(x, y, w, h, obj, callback){
-
-}
 
 
 onload = function(){
@@ -883,12 +904,13 @@ function drawText(ctx, text, x, y, size, color) {
 const BUTTON_W = 150
 const BUTTON_H = 300*BUTTON_W/700
 console.log({BUTTON_H})
-let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT-100); //path,x,y,w,h
+let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT-80); //path,x,y,w,h
 let result_img_obj = new ResizeStaticImg('img/result.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
 let logo_img_obj = new ResizeStaticImg('img/title_logo.png') // 1280*1280
 let button_start_img_obj = new ResizeStaticImg('img/buttons/button_start.png') //w=700 h=300
 let button_setting_img_obj = new ResizeStaticImg('img/buttons/button_setting.png') //w=700 h=300
 let button_exit_img_obj = new ResizeStaticImg('img/buttons/button_exit.png') //w=700 h=300
+
 
 function gameloop(){
     timer += 1;
@@ -906,10 +928,33 @@ function gameloop(){
         change_gamespeed_time = 0;
 
         title_img_obj.draw()
-        button_start_img_obj.draw2(0, 450, BUTTON_W, BUTTON_H);
         // drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
         // drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
-        logo_img_obj.draw2(37-20,8-20+2*Math.sin(timer/20),300,300);
+        logo_x = 17
+        logo_y = -10+2*Math.sin(timer/20)
+        logo_s = 300
+        logo_img_obj.draw2(logo_x,logo_y,logo_s,logo_s);
+        
+
+        for (let i=0; i<3; i++){
+            HTML_W = 500
+            button_start_img_obj.draw2(i*HTML_W/3, 450, BUTTON_W, BUTTON_H);
+        }
+        
+        // button_start_img_obj.draw2(0, 450, BUTTON_W, BUTTON_H);
+        // button_start_img_obj.draw2(0, 450, BUTTON_W, BUTTON_H);
+
+        // 一度だけ実行したい→ループ外に位置させる→ループ内とループ外それぞれを描かないといけない。
+        // 表示と処理を関連付けたい
+        document.addEventListener('mouseup', e => {
+            // console.log('X', e.offsetX)
+            // console.log('Y', e.offsetY)
+            if(logo_x < e.offsetX && e.offsetX < logo_x+logo_s){
+                console.log('ok')
+
+            }
+        }, {once:true});
+
 
         window.addEventListener('keydown', event => {
             if(event.code === 'Space'){
