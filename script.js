@@ -55,7 +55,7 @@ const chara_animation_imgs = [
     Array.from({ length: 16 }, (_, i) => `img/chara3_animation/${i + 1}.PNG`)
 ];
 const enemy_move_imgs = [
-    Array.from({ length: 15 }, (_, i) => `img/enemy1_move/${i + 1}.PNG`)
+    Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_gold_move/${i + 1}.PNG`)
 ];
 
 
@@ -633,6 +633,8 @@ function keydown(e){
 
 function mousedown(e){
     player.grab();
+    console.log('x', e.pageX)
+    console.log('y', e.pageY)
 }
 
 function mouseup(e){
@@ -666,6 +668,11 @@ function enemy_animation_proceed(game_mode){
         }
     }
 }
+
+
+// 指定game_modeで、ボタンを表示
+// 押すとgame_modeの変更
+
 
 // actual_drawのブランチで導入
 // グローバル関数として画像リサイズ処理を定義
