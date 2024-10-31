@@ -580,8 +580,8 @@ class ClickableButton {
         document.addEventListener("mousedown", this.handleMouseDown.bind(this));
 
         // 描画側：リサイズして描画
-        const originalImg = new Image();
-        originalImg.src = _img_path;
+        this.originalImg = new Image();
+        this.originalImg.src = _img_path;
         this.resizeCanvas = document.createElement('canvas');
         this.resizeCanvas_ctx = this.resizeCanvas.getContext('2d');
         
@@ -599,6 +599,7 @@ class ClickableButton {
     }
     
     draw_and_define(x0,y0,w0,h0){
+        // この関数が呼び出されて初めてボタン位置・大きさがちゃんと決まる
         this.x = x0;
         this.y = y0;
         this.w = w0;
@@ -607,6 +608,12 @@ class ClickableButton {
             this.resizeCanvas,
             x0,y0,
             w0,h0); // 表示全体を、絵・枠両方拡大
+
+        // デバッグ用：クリック判定範囲を赤い枠線で表示
+        graphic.beginPath();
+        graphic.strokeStyle = 'red'; // 枠線の色
+        graphic.lineWidth = 3; // 枠線の太さ
+        graphic.strokeRect(x0, y0, w0, h0);
         console.log(this.x,this.y,this.w,this.h);
     }
 
@@ -621,11 +628,13 @@ class ClickableButton {
     }
     // マウスダウン時の処理
     handleMouseDown(event) {
-        const clickX = event.clientX;
-        const clickY = event.clientY;
+        const clickX = event.offsetX; //offsetX...canvas自体の左上を基準とした座標
+        const clickY = event.offsetY;
         // クリック位置が範囲内ならコールバックを実行
-        if (game_mode === allow_mode && this.isWithinBounds(clickX, clickY)) {
+        // if (game_mode === allow_mode && this.isWithinBounds(clickX, clickY)) {
+        if (this.isWithinBounds(clickX, clickY)) {
             this.callback();
+            console.log('clickablebutton was clicked')
         }
     }
 }
@@ -907,10 +916,12 @@ console.log({BUTTON_H})
 let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT-80); //path,x,y,w,h
 let result_img_obj = new ResizeStaticImg('img/result.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
 let logo_img_obj = new ResizeStaticImg('img/title_logo.png') // 1280*1280
-let button_start_img_obj = new ResizeStaticImg('img/buttons/button_start.png') //w=700 h=300
-let button_setting_img_obj = new ResizeStaticImg('img/buttons/button_setting.png') //w=700 h=300
-let button_exit_img_obj = new ResizeStaticImg('img/buttons/button_exit.png') //w=700 h=300
-
+// let button_start_img_obj = new ResizeStaticImg('img/buttons/button_start.png') //w=700 h=300
+// let button_setting_img_obj = new ResizeStaticImg('img/buttons/button_setting.png') //w=700 h=300
+// let button_exit_img_obj = new ResizeStaticImg('img/buttons/button_exit.png') //w=700 h=300
+let button_start = new ClickableButton('img/buttons/button_start.png', 'in_title', () => {
+    console.log('testtest')
+})
 
 function gameloop(){
     timer += 1;
@@ -935,25 +946,25 @@ function gameloop(){
         logo_s = 300
         logo_img_obj.draw2(logo_x,logo_y,logo_s,logo_s);
         
-
-        for (let i=0; i<3; i++){
-            HTML_W = 500
-            button_start_img_obj.draw2(i*HTML_W/3, 450, BUTTON_W, BUTTON_H);
-        }
+        button_start.draw_and_define(10,400,BUTTON_W,BUTTON_H);
+        // for (let i=0; i<3; i++){
+        //     HTML_W = 500
+        //     button_start_img_obj.draw2(i*HTML_W/3, 450, BUTTON_W, BUTTON_H);
+        // }
         
         // button_start_img_obj.draw2(0, 450, BUTTON_W, BUTTON_H);
         // button_start_img_obj.draw2(0, 450, BUTTON_W, BUTTON_H);
 
         // 一度だけ実行したい→ループ外に位置させる→ループ内とループ外それぞれを描かないといけない。
         // 表示と処理を関連付けたい
-        document.addEventListener('mouseup', e => {
-            // console.log('X', e.offsetX)
-            // console.log('Y', e.offsetY)
-            if(logo_x < e.offsetX && e.offsetX < logo_x+logo_s){
-                console.log('ok')
+        // document.addEventListener('mouseup', e => {
+        //     // console.log('X', e.offsetX)
+        //     // console.log('Y', e.offsetY)
+        //     if(logo_x < e.offsetX && e.offsetX < logo_x+logo_s){
+        //         console.log('ok')
 
-            }
-        }, {once:true});
+        //     }
+        // }, {once:true});
 
 
         window.addEventListener('keydown', event => {
