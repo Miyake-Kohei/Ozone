@@ -25,27 +25,27 @@ let wave_contents = [
     { type: 'green', move_interval: 60, spawnSec: 4  ,HP: 30},
     { type: 'green', move_interval: 45, spawnSec: 7 ,HP: 10},
     { type: 'green', move_interval: 60, spawnSec: 10 ,HP: 40},
-    { type: 'green', move_interval: 120, spawnSec: 15, HP:100},
+    { type: 'gold', move_interval: 120, spawnSec: 15, HP:100},
     { type: 'blue', move_interval: 60, spawnSec: 20 , HP: 40},
     { type: 'orange', move_interval: 60, spawnSec: 23 , HP: 50},
-    { type: 'purple', move_interval: 50, spawnSec: 26 , HP: 30},
+    { type: 'pink', move_interval: 50, spawnSec: 26 , HP: 30},
     { type: 'green', move_interval: 60, spawnSec: 30 , HP: 50},
-    { type: 'green', move_interval: 240, spawnSec: 34 ,HP:450},
+    { type: 'gold', move_interval: 240, spawnSec: 34 ,HP:450},
     { type: 'green', move_interval: 55, spawnSec: 41 , HP: 60},
     { type: 'green', move_interval: 60, spawnSec: 43 , HP: 90},
     { type: 'blue', move_interval: 30, spawnSec: 46 , HP: 50},
     { type: 'green', move_interval: 60, spawnSec: 50 ,HP: 50},
-    { type: 'green', move_interval: 90, spawnSec: 54 ,HP: 400},
+    { type: 'gold', move_interval: 90, spawnSec: 54 ,HP: 250},
     { type: 'green', move_interval: 80, spawnSec: 55 ,HP: 50},
     { type: 'green', move_interval: 40, spawnSec: 59 ,HP: 80},
     { type: 'green', move_interval: 60, spawnSec: 60 ,HP: 90},
     { type: 'green', move_interval: 62, spawnSec: 63 ,HP: 100},
-    { type: 'green', move_interval: 65, spawnSec: 65 ,HP: 500},
-    { type: 'blue', move_interval: 20, spawnSec: 68 ,HP: 10},
+    { type: 'gold', move_interval: 120, spawnSec: 65 ,HP: 500},
+    { type: 'green', move_interval: 20, spawnSec: 68 ,HP: 10},
     { type: 'green', move_interval: 63, spawnSec: 70 ,HP: 110},
     { type: 'green', move_interval: 60, spawnSec: 72 ,HP: 120},
     { type: 'green', move_interval: 40, spawnSec: 74 ,HP: 70},
-    { type: 'green', move_interval: 100, spawnSec: 78 ,HP: 1000},
+    { type: 'gold', move_interval: 150, spawnSec: 78 ,HP: 700},
 ];
 let random_speed = 0;
 let random_contents = 3;
@@ -519,7 +519,7 @@ class Enemy{
 
     damaged(id,damage){
         let type_to_id_idx ={
-            purple: 0,
+            pink: 0,
             blue :  1,
             orange: 2,
             gold:   3,
@@ -535,7 +535,7 @@ class Enemy{
         // 特定タレットのみ攻撃を通す処理
         else{
             if(enemy_id === id){
-                this.hp -= damage * 20;
+                this.hp -= damage * 10;
                 console.log("critical!")
             }
             else{
@@ -683,7 +683,7 @@ function addEnemy(_move_interval,HP,_enemy_type){
             }
 
             if(change_enemy_type >= 92 && change_enemy_type <= 96){
-                _enemy_type = 'purple';
+                _enemy_type = 'pink';
             }
         }
         if(change_enemy_type > 96){
