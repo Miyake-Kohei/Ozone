@@ -577,7 +577,8 @@ class ClickableButton {
         this.w = 0;
         this.h = 0;
         this.allow_mode = _allow_mode;
-        this.callback = _callback; // クリック時に実行される処理（関数）
+        this.callback; 
+        // クリック時に実行される処理（関数）
         document.addEventListener("mousedown", this.handleMouseDown.bind(this));
 
         // 描画側：リサイズして描画
@@ -599,12 +600,13 @@ class ClickableButton {
         }
     }
     
-    draw_and_define(x0,y0,w0,h0){
+    draw_and_define(x0,y0,w0,h0,callback0){
         // この関数が呼び出されて初めてボタン位置・大きさがちゃんと決まる
         this.x = x0;
         this.y = y0;
         this.w = w0;
         this.h = h0;
+        this.callback = callback0;
         graphic.drawImage(
             this.resizeCanvas,
             x0,y0,
@@ -921,15 +923,13 @@ let logo_img_obj = new ResizeStaticImg('img/title_logo.png') // 1280*1280
 // let button_start_img_obj = new ResizeStaticImg('img/buttons/button_start.png') //w=700 h=300
 // let button_setting_img_obj = new ResizeStaticImg('img/buttons/button_setting.png') //w=700 h=300
 // let button_exit_img_obj = new ResizeStaticImg('img/buttons/button_exit.png') //w=700 h=300
-let button_start_title = new ClickableButton('img/buttons/button_start.png', 'in_title', () => {
-    console.log('testtest')
-})
-let button_setting = new ClickableButton('img/buttons/button_setting.png', 'in_title', () => {
-    console.log('testtest')
-})
-let button_exit = new ClickableButton('img/buttons/button_exit.png', 'in_title', () => {
-    console.log('testtest')
-})
+let button_start_title = new ClickableButton('img/buttons/button_start.png', 'in_title')
+// let button_setting = new ClickableButton('img/buttons/button_setting.png', 'in_title', () => {
+//     console.log('testtest')
+// })
+// let button_exit = new ClickableButton('img/buttons/button_exit.png', 'in_title', () => {
+//     console.log('testtest')
+// })
 
 function gameloop(){
     timer += 1;
@@ -967,9 +967,18 @@ function gameloop(){
             const CX1 = HTML_WIDTH*1/6-BUTTON_W/2
             const CX2 = HTML_WIDTH*3/6-BUTTON_W/2
             const CX3 = HTML_WIDTH*5/6-BUTTON_W/2
-            button_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H);
-            button_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H);
-            button_start_title.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H);
+            // button_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H, () => {
+            //     console.log('fwajeofi')
+            // });
+            // button_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H);
+            button_start_title.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
+                graphic.clearRect(0,0, CWidth, CHeight);
+                game_mode = 'in_game';
+                gamespeed = 1;
+                change_gamespeed_flag = 1;
+                timer = 0;
+                wave_count = 1;
+            });
         }
 
         window.addEventListener('keydown', event => {
