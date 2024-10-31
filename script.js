@@ -21,7 +21,7 @@ let turret_cost = [
 let wave_count = 0;
 let wave_mode = 'calm';
 let wave_contents = [
-    { type: 'green', move_interval: 60, spawnSec: 1  ,HP: 20},
+    { type: 'purple', move_interval: 60, spawnSec: 1  ,HP: 20},
     { type: 'blue', move_interval: 60, spawnSec: 4  ,HP: 30},
     { type: 'orange', move_interval: 45, spawnSec: 7 ,HP: 10},
     { type: 'gold', move_interval: 60, spawnSec: 10 ,HP: 40},
@@ -571,7 +571,7 @@ onload = function(){
     //初期化
     init()
     //入力処理
-    document.onkeydown = keydown;
+    document.onkeyup = keyup;
     document.onmousemove = mousemove;
     document.onmouseover = mouseover;
     document.onmousedown = mousedown;
@@ -692,7 +692,7 @@ function draw(){
     player.draw();
 }
 
-function keydown(e){
+function keyup(e){
 
 }
 
@@ -853,7 +853,7 @@ function gameloop(){
         drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
         drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
         
-        window.addEventListener('keydown', event => {
+        window.addEventListener('keyup', event => {
             if(event.code === 'Space'){
                 if( game_mode === 'in_title' ){
                     graphic.clearRect(0,0, CWidth, CHeight);
@@ -872,7 +872,7 @@ function gameloop(){
         draw();
         //console.log(wave_mode)
 
-        window.addEventListener('keydown', event => {
+        window.addEventListener('keyup', event => {
             if(event.code === 'Space'){
                 if(wave_mode === 'calm'){
                     wave_mode = 'battle';
