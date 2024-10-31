@@ -54,8 +54,6 @@ const chara_animation_imgs = [
     Array.from({ length: 16 }, (_, i) => `img/chara2_animation/${i + 1}.PNG`),
     Array.from({ length: 16 }, (_, i) => `img/chara3_animation/${i + 1}.PNG`)
 ];
-const HTML_WIDTH = 640;
-const HTML_HEIGHT = 500;
 
 
 class Player{
@@ -285,6 +283,7 @@ class Turret{
         this.animas_idx = 1;
         // 過去書いた処理を使うための代入。
         // this.animas内の要素はどれも大きさ同じなので[0]を使用。
+        console.log('sadfsaf', this.animas[0])
         this.pict = this.animas[0];
         let damagechip =[
             15,10,50
@@ -369,10 +368,29 @@ class Enemy{
 
         this.resized_picts = resizeImages(enemychip, map.TILE_SIZE) //画像拡縮の処理
         this.pict = this.resized_picts[0] //リサイズ画像を代入
+
+        // アニメーション用
+        this.resized_animations = resizeImages(enemy_move_imgs[0], map.TILE_SIZE, 'h', -5,0);
+        this.animas = this.resized_animations;
+        this.animas_idx = 1;
+        console.log(this.animas[0])
+        // this.pict = this.animas[0][0];
     }
 
-    draw(){
-        graphic.drawImage(this.pict, this.x_canvas, this.y_canvas, map.vrble_width, map.vrble_height);
+    // draw(){
+    //     graphic.drawImage(this.pict, this.x_canvas, this.y_canvas, map.vrble_width, map.vrble_height);
+    // }
+
+    // アニメーションの番号送りのみを行う（init()内のsetIntervalで使用）
+    proceed_animation(){
+        this.animas_idx = (this.animas_idx+1) % this.animas.length;
+    }
+    // 画像の表示のみ行う。（グローバルのdraw()内で使用）
+    draw_animation(){
+        graphic.drawImage(
+            this.animas[this.animas_idx], 
+            this.x_canvas, 
+            this.y_canvas); //this.x,yは存在しないので、this.x,y_canvasで代用
     }
 
     search_move(){
@@ -537,6 +555,7 @@ onload = function(){
     document.onmousedown = mousedown;
     document.onmouseup = mouseup;
 
+    setInterval("enemy_animation_proceed(game_mode)", 60)
     setInterval("turret_animation_proceed(game_mode)", 70) // アニメーションの番号送り専用
     setInterval("gameloop()",16)
 }
@@ -639,7 +658,8 @@ function draw(){
     graphic.fillRect(0,0,canvas.width,canvas.height);
     map.draw();
     for(let enemy of enemies){
-        enemy.draw();
+        // enemy.draw();
+        enemy.draw_animation();
     }
     for(let turret of turrets){
         // turret.draw();
@@ -658,6 +678,8 @@ function keydown(e){
 
 function mousedown(e){
     player.grab();
+    console.log('x', e.pageX)
+    console.log('y', e.pageY)
 }
 
 function mouseup(e){
@@ -676,6 +698,7 @@ function mouseover(e){
 
 }
 
+
 function turret_animation_proceed(game_mode){
     if (game_mode === 'in_game') {
         for (let turret of turrets) {
@@ -683,11 +706,23 @@ function turret_animation_proceed(game_mode){
         }
     }
 }
+function enemy_animation_proceed(game_mode){
+    if (game_mode === 'in_game') {
+        for (let enemy of enemies) {
+            enemy.proceed_animation();
+        }
+    }
+}
+
+
+// 指定game_modeで、ボタンを表示
+// 押すとgame_modeの変更
+
 
 // actual_drawのブランチで導入
 // グローバル関数として画像リサイズ処理を定義
 // 返り値は画像objの配列なので、画像obj用の変数(this.pictなど)に代入して使えます。
-function resizeImages(CHIP, TILE_SIZE) {
+function resizeImages(CHIP, TILE_SIZE, _inv='', _offsetX=0, _offsetY=0) {
     // リサイズ済み画像を格納する配列
     const resizedImages = [];
 
@@ -699,14 +734,26 @@ function resizeImages(CHIP, TILE_SIZE) {
         const canvas = document.createElement('canvas');
         canvas.width = TILE_SIZE;
         canvas.height = TILE_SIZE;
-        const ctx = canvas.getContext('2d');
+        let ctx = canvas.getContext('2d');
 
-        // onloadでキャンバスに描画する
-        image.onload = () => {
+        // 画像読込完了時の処理
+        image.onload = () => {    
+            ctx.translate(_offsetX, _offsetY); //
+            // 反転処理の設定
+            if (_inv.includes('h')) { // 水平反転
+                ctx.scale(-1, 1);
+                ctx.translate(-TILE_SIZE, 0);
+            }
+            if (_inv.includes('v')) { // 垂直反転
+                ctx.scale(1, -1);
+                ctx.translate(0, -TILE_SIZE);
+            }
             // 元の画像を指定のサイズにリサイズして描画
             ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, TILE_SIZE, TILE_SIZE);
+            // 次回描画時に影響しないように、変換マトリックスをリセット
+            // ctx.setTransform(1, 0, 0, 1, 0, 0) 
         };
-
+ 
         // リサイズされた画像(canvas)を配列に追加
         resizedImages.push(canvas);
     }
