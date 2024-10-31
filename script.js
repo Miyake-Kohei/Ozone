@@ -613,12 +613,14 @@ class ClickableButton {
             w0,h0); // 表示全体を、絵・枠両方拡大
 
         // デバッグ用：クリック判定範囲を赤い枠線で表示
-        graphic.beginPath();
-        graphic.strokeStyle = 'red'; // 枠線の色
-        graphic.lineWidth = 3; // 枠線の太さ
-        graphic.strokeRect(x0, y0, w0, h0);
-
-        // console.log(this.x,this.y,this.w,this.h);
+        if (false){
+            graphic.beginPath();
+            graphic.strokeStyle = 'red'; // 枠線の色
+            graphic.lineWidth = 3; // 枠線の太さ
+            graphic.strokeRect(x0, y0, w0, h0);
+            // console.log(this.x,this.y,this.w,this.h);
+        }
+        
     }
 
     // 範囲内のクリックか判定するメソッド
@@ -920,16 +922,15 @@ console.log({BUTTON_H})
 let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT-80); //path,x,y,w,h
 let result_img_obj = new ResizeStaticImg('img/result.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
 let logo_img_obj = new ResizeStaticImg('img/title_logo.png') // 1280*1280
-// let button_start_img_obj = new ResizeStaticImg('img/buttons/button_start.png') //w=700 h=300
-// let button_setting_img_obj = new ResizeStaticImg('img/buttons/button_setting.png') //w=700 h=300
-// let button_exit_img_obj = new ResizeStaticImg('img/buttons/button_exit.png') //w=700 h=300
-let button_start_title = new ClickableButton('img/buttons/button_start.png', 'in_title')
-// let button_setting = new ClickableButton('img/buttons/button_setting.png', 'in_title', () => {
-//     console.log('testtest')
-// })
-// let button_exit = new ClickableButton('img/buttons/button_exit.png', 'in_title', () => {
-//     console.log('testtest')
-// })
+
+let btn_title_exit = new ClickableButton('img/buttons/button_exit.png', 'in_title');
+let btn_title_setting = new ClickableButton('img/buttons/button_setting.png', 'in_title');
+let btn_title_start = new ClickableButton('img/buttons/button_start.png', 'in_title');
+
+let btn_result_exit = new ClickableButton('img/buttons/button_exit.png', 'in_result');
+
+
+// let btn_debug_gameover = new ClickableButton('img/enemy_temp.png', 'in_title');
 
 function gameloop(){
     timer += 1;
@@ -954,24 +955,20 @@ function gameloop(){
         logo_s = 300
         logo_img_obj.draw2(logo_x,logo_y,logo_s,logo_s);
         
-        // const btn_title_h = 400
-        // const btn_title_cx1 = HTML_WIDTH*1/6-BUTTON_W/2
-        // const btn_title_cx2 = HTML_WIDTH*3/6-BUTTON_W/2
-        // const btn_title_cx3 = HTML_WIDTH*5/6-BUTTON_W/2
-        // button_exit.draw_and_define(btn_title_cx1, btn_title_h ,BUTTON_W,BUTTON_H);
-        // button_setting.draw_and_define(btn_title_cx2, btn_title_h ,BUTTON_W,BUTTON_H);
-        // button_start_title.draw_and_define(btn_title_cx3, btn_title_h ,BUTTON_W,BUTTON_H);
-        
-        { //{}内で定義された変数は外部からアクセスできない（即時実行関数式）
+        // タイトルのボタン群
+        { //{}で囲むと、この中で定義された変数は外部からアクセスできない（即時実行関数式）
             const CH = 428
             const CX1 = HTML_WIDTH*1/6-BUTTON_W/2
             const CX2 = HTML_WIDTH*3/6-BUTTON_W/2
             const CX3 = HTML_WIDTH*5/6-BUTTON_W/2
-            // button_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H, () => {
-            //     console.log('fwajeofi')
-            // });
-            // button_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H);
-            button_start_title.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
+            btn_title_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H, ()=>{
+                console.log('おわる');
+            });
+            btn_title_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H, ()=>{
+                console.log('せってい');
+            });
+            btn_title_start.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
+                console.log('はじめる')
                 graphic.clearRect(0,0, CWidth, CHeight);
                 game_mode = 'in_game';
                 gamespeed = 1;
@@ -1097,7 +1094,16 @@ function gameloop(){
         
         result_img_obj.draw()
         drawText(graphic, "Result", CWidth*3/4, CHeight/8, 60, "rgb(100, 100, 100)");
-        
+        // 戻るボタン
+        {//即時実行関数
+            const CH = 428
+            const CX3 = HTML_WIDTH*5/6-BUTTON_W/2
+            btn_result_exit.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
+                console.log('おわる');
+                game_mode = 'in_title'
+                graphic.clearRect(0,0, CWidth, CHeight);
+            });
+        }
     }
 
 
