@@ -54,6 +54,8 @@ const chara_animation_imgs = [
     Array.from({ length: 16 }, (_, i) => `img/chara2_animation/${i + 1}.PNG`),
     Array.from({ length: 16 }, (_, i) => `img/chara3_animation/${i + 1}.PNG`)
 ];
+const HTML_WIDTH = 640;
+const HTML_HEIGHT = 500;
 
 
 class Player{
@@ -177,10 +179,21 @@ class Map{
             this.dy_judge = Math.abs(emy.y_grid - this.player_base[1]) < 1;
 
             if (this.dx_judge && this.dy_judge) {
-                //_before_enemies = enemies;
                 emy.isDead = true;
                 removeEnemy();
-                //console.log('removeEnemy: ', _before_enemies, '→', enemies);
+                
+                if (game_mode === 'in_game') {
+                    timer = 0;
+                    game_mode = 'in_gameover';
+                }
+                
+                // 拠点にライフを設ける場合の処理
+                // emy.isDead = true;
+                // removeEnemy();
+                // this.player_base_life -= 1
+                // if (this.player_base_life <= 0) {
+                    
+                // }
             }
         }
 
@@ -471,6 +484,43 @@ class Enemy{
     }
 }
 
+class ResizeStaticImg{
+    constructor(_img_source, _x, _y, _w, _h){
+        this.originalImg;
+        this.resizeCanvas;
+        this.x = _x;
+        this.y = _y;
+        this.width = _w;
+        this.height = _h;
+        
+        this.originalImg = new Image();
+        this.originalImg.src = _img_source; // 画像のソースを設定
+        // 拡縮された画像を保持するためのキャンバス
+        this.resizeCanvas = document.createElement('canvas');
+        this.resizeCanvas_ctx = this.resizeCanvas.getContext('2d');
+
+        // キャンバスに描画
+        this.originalImg.onload = () => {
+            this.resizeCanvas.width = 1920;
+            this.resizeCanvas.height = 1080;
+            this.resizeCanvas_ctx.drawImage(
+                this.originalImg,   // 描画obj
+                0,0,                // 切り取り開始座標
+                this.originalImg.width, this.originalImg.height, // 切り取り幅
+                0,0,                // キャンバス上の描画開始座標
+                this.resizeCanvas.width,this.resizeCanvas.height);
+                // 300, 150); //描画サイズ（not枠）。ここを切れるぎりぎりに調節する。
+        }
+    }
+    draw(){
+        graphic.drawImage(
+            this.resizeCanvas,
+            this.x,this.y,
+            this.width,this.height); // 表示全体を、絵・枠両方拡大
+            // this.originalImgs[0].width,this.originalImgs[0].height);
+    }
+}
+
 onload = function(){
     canvas = document.getElementById("game");
     graphic = canvas.getContext("2d");
@@ -665,6 +715,44 @@ function resizeImages(CHIP, TILE_SIZE) {
     return resizedImages;
 }
 
+// 失敗作（バグります）
+// async function resizeImages_async(CHIP, TILE_SIZE) {
+//     // リサイズ済み画像を格納する配列
+//     const resizedImages = [];
+
+//     for (let i = 0; i < CHIP.length; i++) {
+//         const image = new Image();
+//         image.src = CHIP[i]; // 画像のソースを設定
+
+//         // 拡縮された画像を保持するためのキャンバスを作成
+//         const canvas = document.createElement('canvas');
+//         canvas.width = TILE_SIZE;
+//         canvas.height = TILE_SIZE;
+//         const ctx = canvas.getContext('2d');
+
+//         return new Promise(
+//             (resolve) => {
+//                 image.onload = () => {
+//                     resolve(image);
+//                 };
+//                 ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, TILE_SIZE, TILE_SIZE);
+//                 resizedImages.push(canvas);
+//             }
+//         )
+//         // onloadでキャンバスに描画する
+//         image.onload = () => {
+//             // 元の画像を指定のサイズにリサイズして描画
+//             ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, TILE_SIZE, TILE_SIZE);
+//         };
+
+//         // リサイズされた画像(canvas)を配列に追加
+//         resizedImages.push(canvas);
+//     }
+
+//     // リサイズ済み画像の配列を返す
+//     return resizedImages;
+// }
+
 function drawText(ctx, text, x, y, size, color) {
     ctx.font = `${size}px hanazome`;
     ctx.fillStyle = color;
@@ -673,9 +761,12 @@ function drawText(ctx, text, x, y, size, color) {
 }
 
 
+// 描画用変数（クラスより上側に配置するとreference error）
+// 「h」の値はいい感じに調節してください。
+let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
+let result_img_obj = new ResizeStaticImg('img/result.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
 
-const title_image = new Image();
-title_image.src = 'img/enemy_move_inv.png'
+
 function gameloop(){
     timer += 1;
     //console.log(game_mode);
@@ -687,7 +778,7 @@ function gameloop(){
         spawn_speed_level = 0;
         enemy_level = 1.0;
 
-        graphic.drawImage(title_image,60,0)
+        title_img_obj.draw()    
         drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
         drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
         
@@ -735,7 +826,7 @@ function gameloop(){
                 if(random_speed >= 30){
                     random_speed = 30;
                 }
-                enemy_level = enemy_level + 0.25 + Math.random() * 0.1;
+                enemy_level = enemy_level + 0.2 + Math.random() * 0.1;
                 timer = 0;
             }
 
@@ -756,5 +847,24 @@ function gameloop(){
                 }
             }
         }
+    }
+
+    if (game_mode === 'in_gameover') {
+        update();
+        draw();
+        drawText(graphic, "GAME OVER", CWidth/2+3, CHeight/2-3, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "GAME OVER", CWidth/2-3, CHeight/2-3, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "GAME OVER", CWidth/2+3, CHeight/2+3, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "GAME OVER", CWidth/2-3, CHeight/2+3, 60, "rgb(50, 50, 50)");
+        drawText(graphic, "GAME OVER", CWidth/2, CHeight/2, 60, "rgb(250, 200, 200)");
+        if (timer > 3*62.5) {
+            game_mode = 'in_result'
+        }
+    }
+    if (game_mode === 'in_result') {
+        
+        result_img_obj.draw()
+        drawText(graphic, "Result", CWidth*3/4, CHeight/8, 60, "rgb(100, 100, 100)");
+        
     }
 }
