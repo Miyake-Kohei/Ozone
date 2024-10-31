@@ -296,7 +296,7 @@ class Turret{
         this.animas_idx = 1;
         // 過去書いた処理を使うための代入。
         // this.animas内の要素はどれも大きさ同じなので[0]を使用。
-        console.log('sadfsaf', this.animas[0])
+        // console.log('sadfsaf', this.animas[0])
         this.pict = this.animas[0];
         let damagechip =[
             17,11,57
@@ -868,43 +868,6 @@ function resizeImages(CHIP, TILE_SIZE, _inv='', _offsetX=0, _offsetY=0) {
     return resizedImages;
 }
 
-// 失敗作（バグります）
-// async function resizeImages_async(CHIP, TILE_SIZE) {
-//     // リサイズ済み画像を格納する配列
-//     const resizedImages = [];
-
-//     for (let i = 0; i < CHIP.length; i++) {
-//         const image = new Image();
-//         image.src = CHIP[i]; // 画像のソースを設定
-
-//         // 拡縮された画像を保持するためのキャンバスを作成
-//         const canvas = document.createElement('canvas');
-//         canvas.width = TILE_SIZE;
-//         canvas.height = TILE_SIZE;
-//         const ctx = canvas.getContext('2d');
-
-//         return new Promise(
-//             (resolve) => {
-//                 image.onload = () => {
-//                     resolve(image);
-//                 };
-//                 ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, TILE_SIZE, TILE_SIZE);
-//                 resizedImages.push(canvas);
-//             }
-//         )
-//         // onloadでキャンバスに描画する
-//         image.onload = () => {
-//             // 元の画像を指定のサイズにリサイズして描画
-//             ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, TILE_SIZE, TILE_SIZE);
-//         };
-
-//         // リサイズされた画像(canvas)を配列に追加
-//         resizedImages.push(canvas);
-//     }
-
-//     // リサイズ済み画像の配列を返す
-//     return resizedImages;
-// }
 
 function drawText(ctx, text, x, y, size, color) {
     ctx.font = `${size}px hanazome`;
@@ -930,7 +893,6 @@ let btn_title_start = new ClickableButton('img/buttons/button_start.png', 'in_ti
 let btn_result_exit = new ClickableButton('img/buttons/button_exit.png', 'in_result');
 
 
-// let btn_debug_gameover = new ClickableButton('img/enemy_temp.png', 'in_title');
 
 function gameloop(){
     timer += 1;
@@ -963,6 +925,7 @@ function gameloop(){
             const CX3 = HTML_WIDTH*5/6-BUTTON_W/2
             btn_title_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H, ()=>{
                 console.log('おわる');
+                window.location.reload();
             });
             btn_title_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H, ()=>{
                 console.log('せってい');
