@@ -317,7 +317,7 @@ class Turret{
         graphic.drawImage(
             this.animas[this.animas_idx], 
             this.animas[this.animas_idx].width*this.x, 
-            this.animas[this.animas_idx].height*this.y);
+            this.animas[this.animas_idx].height*this.y-25);
     }
 
     aim(){
