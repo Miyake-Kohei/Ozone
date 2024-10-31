@@ -21,16 +21,16 @@ let turret_cost = [
 let wave_count = 0;
 let wave_mode = 'calm';
 let wave_contents = [
-    { type: 'purple', move_interval: 60, spawnSec: 1  ,HP: 20},
-    { type: 'blue', move_interval: 60, spawnSec: 4  ,HP: 30},
-    { type: 'orange', move_interval: 45, spawnSec: 7 ,HP: 10},
-    { type: 'gold', move_interval: 60, spawnSec: 10 ,HP: 40},
-    { type: 'blue', move_interval: 120, spawnSec: 15, HP:100},
-    { type: 'gold', move_interval: 60, spawnSec: 20 , HP: 40},
+    { type: 'green', move_interval: 60, spawnSec: 1  ,HP: 20},
+    { type: 'green', move_interval: 60, spawnSec: 4  ,HP: 30},
+    { type: 'green', move_interval: 45, spawnSec: 7 ,HP: 10},
+    { type: 'green', move_interval: 60, spawnSec: 10 ,HP: 40},
+    { type: 'green', move_interval: 120, spawnSec: 15, HP:100},
+    { type: 'blue', move_interval: 60, spawnSec: 20 , HP: 40},
     { type: 'orange', move_interval: 60, spawnSec: 23 , HP: 50},
-    { type: 'green', move_interval: 50, spawnSec: 26 , HP: 30},
+    { type: 'purple', move_interval: 50, spawnSec: 26 , HP: 30},
     { type: 'green', move_interval: 60, spawnSec: 30 , HP: 50},
-    { type: 'orange', move_interval: 240, spawnSec: 34 ,HP:450},
+    { type: 'green', move_interval: 240, spawnSec: 34 ,HP:450},
     { type: 'green', move_interval: 55, spawnSec: 41 , HP: 60},
     { type: 'green', move_interval: 60, spawnSec: 43 , HP: 90},
     { type: 'green', move_interval: 30, spawnSec: 46 , HP: 50},
@@ -40,12 +40,12 @@ let wave_contents = [
     { type: 'green', move_interval: 40, spawnSec: 59 ,HP: 80},
     { type: 'green', move_interval: 60, spawnSec: 60 ,HP: 90},
     { type: 'green', move_interval: 62, spawnSec: 63 ,HP: 100},
-    { type: 'green', move_interval: 65, spawnSec: 65 ,HP: 400},
+    { type: 'green', move_interval: 65, spawnSec: 65 ,HP: 500},
     { type: 'green', move_interval: 20, spawnSec: 68 ,HP: 10},
     { type: 'green', move_interval: 63, spawnSec: 70 ,HP: 110},
     { type: 'green', move_interval: 60, spawnSec: 72 ,HP: 120},
-    { type: 'green', move_interval: 40, spawnSec: 23 ,HP: 70},
-    { type: 'green', move_interval: 100, spawnSec: 23 ,HP: 1000},
+    { type: 'green', move_interval: 40, spawnSec: 74 ,HP: 70},
+    { type: 'green', move_interval: 100, spawnSec: 78 ,HP: 1000},
 ];
 let random_speed = 0;
 let random_contents = 3;
@@ -127,7 +127,7 @@ class Player{
             let portrait = pict
         
             graphic.drawImage(portrait, portrait.width*(2*i+1), displayY); 
-            i++;       
+            i++;
         }
     }
 
@@ -268,7 +268,7 @@ class Bullet{
             //console.log(enemy.pict.width)
             const dis = Math.sqrt(dx*dx+dy*dy);
             if(dis<enemy.pict.width/2){
-                enemy.hp -= this.damage;
+                enemy.damaged(this.id,this.damage);
                 this.away = true;
                 //console.log("hit");
             }
@@ -517,9 +517,39 @@ class Enemy{
     attack(){
     }
 
+    damaged(id,damage){
+        let type_to_id_idx ={
+            purple: 0,
+            blue :  1,
+            orange: 2,
+            gold:   3,
+            green:  3,
+            boss:   3
+        };
+        let enemy_id = type_to_id_idx[this.type];
+
+        if(enemy_id === 3){
+            this.hp -= damage;
+        }
+
+        // 特定タレットのみ攻撃を通す処理
+        else{
+            if(enemy_id === id){
+                this.hp -= damage * 20;
+                console.log("critical!")
+            }
+            else{
+                this.hp -= Math.floor( damage / 5);
+                console.log("sorry")
+            }
+        }
+    }
     dead(){
         if(this.hp <= 0){
             this.isDead = true;
+            if(this.type === 'gold'){
+                player.resource++;
+            }
         }
     }
 }
@@ -640,6 +670,25 @@ function addEnemy(_move_interval,HP,_enemy_type){
     _enemy_speed = _move_interval-Math.floor( Math.random() * random_speed);
     if(_enemy_speed <= 0){
         _enemy_speed = 1;
+    }
+    if(_enemy_type === 'green'){
+        let change_enemy_type = Math.floor( Math.random() * 100);
+        if(wave_count >= 7){
+            if(change_enemy_type >= 82 && change_enemy_type <= 86){
+                _enemy_type = 'blue';
+            }
+
+            if(change_enemy_type >= 87 && change_enemy_type <= 91){
+                _enemy_type = 'orange';
+            }
+
+            if(change_enemy_type >= 92 && change_enemy_type <= 96){
+                _enemy_type = 'purple';
+            }
+        }
+        if(change_enemy_type > 0){
+            _enemy_type = 'gold';
+        }
     }
     let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _enemy_speed,Math.floor(HP * enemy_level), _enemy_type); //id,x,y,enemychip,speed,HP最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     console.log(enemy.hp)
@@ -928,7 +977,7 @@ function gameloop(){
                 if(random_speed >= 30){
                     random_speed = 30; // 速くなりすぎないように
                 }
-                enemy_level = enemy_level + 0.2 + Math.random() * 0.1; //HP倍率の上昇
+                enemy_level = enemy_level + 0.3 + Math.random() * 0.1; //HP倍率の上昇
                 timer = 0;
             }
 
@@ -937,13 +986,13 @@ function gameloop(){
                 // addEnemy(spawn_flag['move_interval'],spawn_flag['HP']);
                 addEnemy(spawn_flag['move_interval'],spawn_flag['HP'],spawn_flag['type']);
                 if( current_spawn < random_contents ){
-                    current_spawn += 1
+                    current_spawn += 1;
                 }
             }
 
             if(current_spawn != 0 && current_spawn % 25 === 0){
                 timer = 0;
-                enemy_level *= 1.5;
+                enemy_level += 2.0;
                 spawn_speed_level += 2;
                 if(spawn_speed_level >= 59){
                     spawn_speed_level = 59;
