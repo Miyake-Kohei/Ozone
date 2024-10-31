@@ -21,31 +21,31 @@ let turret_cost = [
 let wave_count = 0;
 let wave_mode = 'calm';
 let wave_contents = [
-    { type: 'enemyType1', move_interval: 60, spawnSec: 1  ,HP: 20},
-    { type: 'enemyType1', move_interval: 60, spawnSec: 4  ,HP: 30},
-    { type: 'enemyType1', move_interval: 45, spawnSec: 7 ,HP: 10},
-    { type: 'enemyType1', move_interval: 60, spawnSec: 10 ,HP: 40},
-    { type: 'enemyType1', move_interval: 120, spawnSec: 15, HP:100},
-    { type: 'enemyType1', move_interval: 60, spawnSec: 20 , HP: 40},
-    { type: 'enemyType1', move_interval: 60, spawnSec: 23 , HP: 50},
-    { type: 'enemyType1', move_interval: 50, spawnSec: 26 , HP: 30},
-    { type: 'enemyType1', move_interval: 60, spawnSec: 30 , HP: 50},
-    { type: 'enemyType1', move_interval: 240, spawnSec: 34 ,HP:450},
-    { type: 'enemyType1', move_interval: 55, spawnSec: 41 , HP: 60},
-    { type: 'enemyType1', move_interval: 60, spawnSec: 43 , HP: 90},
-    { type: 'enemyType1', move_interval: 30, spawnSec: 46 , HP: 50},
-    { type: 'enemyType1', move_interval: 60, spawnSec: 50 ,HP: 50},
-    { type: 'enemyType1', move_interval: 90, spawnSec: 54 ,HP: 400},
-    { type: 'enemyType1', move_interval: 80, spawnSec: 55 ,HP: 50},
-    { type: 'enemyType1', move_interval: 40, spawnSec: 59 ,HP: 80},
-    { type: 'enemyType1', move_interval: 60, spawnSec: 60 ,HP: 90},
-    { type: 'enemyType1', move_interval: 62, spawnSec: 63 ,HP: 100},
-    { type: 'enemyType1', move_interval: 65, spawnSec: 65 ,HP: 400},
-    { type: 'enemyType1', move_interval: 20, spawnSec: 68 ,HP: 10},
-    { type: 'enemyType1', move_interval: 63, spawnSec: 70 ,HP: 110},
-    { type: 'enemyType1', move_interval: 60, spawnSec: 72 ,HP: 120},
-    { type: 'enemyType1', move_interval: 40, spawnSec: 23 ,HP: 70},
-    { type: 'enemyType1', move_interval: 100, spawnSec: 23 ,HP: 1000},
+    { type: 'green', move_interval: 60, spawnSec: 1  ,HP: 20},
+    { type: 'blue', move_interval: 60, spawnSec: 4  ,HP: 30},
+    { type: 'orange', move_interval: 45, spawnSec: 7 ,HP: 10},
+    { type: 'gold', move_interval: 60, spawnSec: 10 ,HP: 40},
+    { type: 'blue', move_interval: 120, spawnSec: 15, HP:100},
+    { type: 'gold', move_interval: 60, spawnSec: 20 , HP: 40},
+    { type: 'orange', move_interval: 60, spawnSec: 23 , HP: 50},
+    { type: 'green', move_interval: 50, spawnSec: 26 , HP: 30},
+    { type: 'green', move_interval: 60, spawnSec: 30 , HP: 50},
+    { type: 'orange', move_interval: 240, spawnSec: 34 ,HP:450},
+    { type: 'green', move_interval: 55, spawnSec: 41 , HP: 60},
+    { type: 'green', move_interval: 60, spawnSec: 43 , HP: 90},
+    { type: 'green', move_interval: 30, spawnSec: 46 , HP: 50},
+    { type: 'green', move_interval: 60, spawnSec: 50 ,HP: 50},
+    { type: 'green', move_interval: 90, spawnSec: 54 ,HP: 400},
+    { type: 'green', move_interval: 80, spawnSec: 55 ,HP: 50},
+    { type: 'green', move_interval: 40, spawnSec: 59 ,HP: 80},
+    { type: 'green', move_interval: 60, spawnSec: 60 ,HP: 90},
+    { type: 'green', move_interval: 62, spawnSec: 63 ,HP: 100},
+    { type: 'green', move_interval: 65, spawnSec: 65 ,HP: 400},
+    { type: 'green', move_interval: 20, spawnSec: 68 ,HP: 10},
+    { type: 'green', move_interval: 63, spawnSec: 70 ,HP: 110},
+    { type: 'green', move_interval: 60, spawnSec: 72 ,HP: 120},
+    { type: 'green', move_interval: 40, spawnSec: 23 ,HP: 70},
+    { type: 'green', move_interval: 100, spawnSec: 23 ,HP: 1000},
 ];
 let random_speed = 0;
 let random_contents = 3;
@@ -60,9 +60,13 @@ const chara_animation_imgs = [
 ];
 const HTML_WIDTH = 640;
 const HTML_HEIGHT = 500;
-const enemy_move_imgs = [
-    Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_gold_move/${i + 1}.PNG`)
-];
+const enemy_move_imgs = {
+    green: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_green_move/${i + 1}.PNG`),
+    blue: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_blue_move/${i + 1}.PNG`),
+    orange: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_orange_move/${i + 1}.PNG`),
+    purple: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_purple_move/${i + 1}.PNG`),
+    gold: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_gold_move/${i + 1}.PNG`)
+};
 
 
 class Player{
@@ -357,7 +361,8 @@ class Turret{
 }
 
 class Enemy{
-    constructor(id,x,y,enemychip,speed,HP){
+    // constructor(id,x,y,enemychip,speed,HP){
+    constructor(id,x,y,enemychip,speed,HP,type){
         //敵を滑らかに動くようにする
         //canvasにおける座標とgridにおける座標の両方を記述する
         this.id = id;
@@ -379,12 +384,13 @@ class Enemy{
         this.move_count=0;
         this.x_move = 0;
         this.y_move = 0;
+        this.type = type;
 
         this.resized_picts = resizeImages(enemychip, map.TILE_SIZE) //画像拡縮の処理
         this.pict = this.resized_picts[0] //リサイズ画像を代入
 
         // アニメーション用
-        this.resized_animations = resizeImages(enemy_move_imgs[0], map.TILE_SIZE, 'h', -5,0);
+        this.resized_animations = resizeImages(enemy_move_imgs[this.type], map.TILE_SIZE, 'h', -5,0);
         this.animas = this.resized_animations;
         this.animas_idx = 1;
         console.log(this.animas[0])
@@ -628,14 +634,14 @@ function addTurret(id,x,y,speed){
     let turret = new Turret(id,x,y,speed,img_turretchip,range_turretchip);
     turrets.push(turret);
 }
-
-function addEnemy(_move_interval,HP){
+// function addEnemy(_move_interval,HP){
+function addEnemy(_move_interval,HP,_enemy_type){
     const img_enemychip = ['img/enemy_move_inv.png'];
     _enemy_speed = _move_interval-Math.floor( Math.random() * random_speed);
     if(_enemy_speed <= 0){
         _enemy_speed = 1;
     }
-    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _enemy_speed,Math.floor(HP * enemy_level)); //id,x,y,enemychip,speed,HP最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
+    let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _enemy_speed,Math.floor(HP * enemy_level), _enemy_type); //id,x,y,enemychip,speed,HP最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     console.log(enemy.hp)
     enemies.push(enemy);
 }
@@ -928,7 +934,8 @@ function gameloop(){
 
             //console.log('current_spawn', current_spawn)
             if( spawn_flag['spawnSec'] === Math.round(timer/(60 - spawn_speed_level)) && current_spawn < random_contents){
-                addEnemy(spawn_flag['move_interval'],spawn_flag['HP']);
+                // addEnemy(spawn_flag['move_interval'],spawn_flag['HP']);
+                addEnemy(spawn_flag['move_interval'],spawn_flag['HP'],spawn_flag['type']);
                 if( current_spawn < random_contents ){
                     current_spawn += 1
                 }
