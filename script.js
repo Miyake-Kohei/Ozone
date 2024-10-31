@@ -33,7 +33,7 @@ let wave_contents = [
     { type: 'green', move_interval: 240, spawnSec: 34 ,HP:450},
     { type: 'green', move_interval: 55, spawnSec: 41 , HP: 60},
     { type: 'green', move_interval: 60, spawnSec: 43 , HP: 90},
-    { type: 'green', move_interval: 30, spawnSec: 46 , HP: 50},
+    { type: 'blue', move_interval: 30, spawnSec: 46 , HP: 50},
     { type: 'green', move_interval: 60, spawnSec: 50 ,HP: 50},
     { type: 'green', move_interval: 90, spawnSec: 54 ,HP: 400},
     { type: 'green', move_interval: 80, spawnSec: 55 ,HP: 50},
@@ -41,7 +41,7 @@ let wave_contents = [
     { type: 'green', move_interval: 60, spawnSec: 60 ,HP: 90},
     { type: 'green', move_interval: 62, spawnSec: 63 ,HP: 100},
     { type: 'green', move_interval: 65, spawnSec: 65 ,HP: 500},
-    { type: 'green', move_interval: 20, spawnSec: 68 ,HP: 10},
+    { type: 'blue', move_interval: 20, spawnSec: 68 ,HP: 10},
     { type: 'green', move_interval: 63, spawnSec: 70 ,HP: 110},
     { type: 'green', move_interval: 60, spawnSec: 72 ,HP: 120},
     { type: 'green', move_interval: 40, spawnSec: 74 ,HP: 70},
@@ -686,7 +686,7 @@ function addEnemy(_move_interval,HP,_enemy_type){
                 _enemy_type = 'purple';
             }
         }
-        if(change_enemy_type > 0){
+        if(change_enemy_type > 96){
             _enemy_type = 'gold';
         }
     }
