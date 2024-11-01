@@ -951,7 +951,7 @@ function gameloop(){
                 });
             }
 
-            window.addEventListener('keydown', event => {
+            window.addEventListener('keyup', event => {
                 if(event.code === 'Space'){
                     if( game_mode === 'in_title' ){
                         graphic.clearRect(0,0, CWidth, CHeight);
