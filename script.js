@@ -34,7 +34,7 @@ let wave_contents = [
     { type: 'boss', move_interval: 240, spawnSec: 34 ,HP:450},
     { type: 'orange', move_interval: 55, spawnSec: 41 , HP: 60},
     { type: 'green', move_interval: 60, spawnSec: 43 , HP: 90},
-    { type: 'blue', move_interval: 30, spawnSec: 46 , HP: 50},
+    { type: 'blue', move_interval: 30, spawnSec: 46 , HP: 20},
     { type: 'green', move_interval: 60, spawnSec: 50 ,HP: 50},
     { type: 'boss', move_interval: 90, spawnSec: 54 ,HP: 400},
     { type: 'green', move_interval: 80, spawnSec: 55 ,HP: 50},
