@@ -1,4 +1,4 @@
-let canvas,graphic,CWidth,CHeight;
+let canvas,graphic,CWidth,CHeight,bgm;
 let enemies = [];
 let enemies_resize = [];
 let turrets = [];
@@ -561,9 +561,14 @@ class ResizeStaticImg{
     }
 }
 
+window.addEventListener('load', () => {
+});
+
+
 onload = function(){
     canvas = document.getElementById("game");
     graphic = canvas.getContext("2d");
+    bgm = document.getElementById('bgm');
 
     //フォント読み込み
     document.fonts.load('10pt"hanazome"');
@@ -856,6 +861,7 @@ function gameloop(){
         window.addEventListener('keydown', event => {
             if(event.code === 'Space'){
                 if( game_mode === 'in_title' ){
+                    bgm.play()
                     graphic.clearRect(0,0, CWidth, CHeight);
                     game_mode = 'in_game';
                     gamespeed = 1;
