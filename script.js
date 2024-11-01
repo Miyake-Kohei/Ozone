@@ -926,38 +926,39 @@ function gameloop(){
         // drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
         
         if (title_mode === 'main'){
-            // タイトルのボタン群
-            { //{}で囲むと、この中で定義された変数は外部からアクセスできない（即時実行関数式）
-                const CH = 428
-                const CX1 = HTML_WIDTH*1/6-BUTTON_W/2
-                const CX2 = HTML_WIDTH*3/6-BUTTON_W/2
-                const CX3 = HTML_WIDTH*5/6-BUTTON_W/2
-                btn_title_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H, ()=>{
-                    console.log('おわる');
-                    window.location.reload(); //ブラウザの再読み込み
-                });
-                btn_title_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H, ()=>{
-                    console.log('せってい');
-                    title_mode = 'setting';
-                });
-                btn_title_start.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
-                    console.log('はじめる');
-                });
-            }
-
-            window.addEventListener('keyup', event => {
-                if(event.code === 'Space'){
-                    if( game_mode === 'in_title' ){
-                        graphic.clearRect(0,0, CWidth, CHeight);
-                        game_mode = 'in_game';
-                        gamespeed = 1;
-                        change_gamespeed_flag = 1;
-                        timer = 0;
-                        wave_count = 1;
-                    }
-                }
+            // ボタンの定義部分を保持
+            const CH = 428;
+            const CX1 = HTML_WIDTH*1/6-BUTTON_W/2;
+            const CX2 = HTML_WIDTH*3/6-BUTTON_W/2;
+            const CX3 = HTML_WIDTH*5/6-BUTTON_W/2;
+            
+            btn_title_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H, ()=>{
+                console.log('おわる');
+                window.location.reload();
+            });
+            
+            btn_title_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H, ()=>{
+                console.log('せってい');
+                title_mode = 'setting';
+            });
+            
+            btn_title_start.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
+                console.log('はじめる');
             });
         }
+        
+        window.addEventListener('keyup', event => {
+            if(event.code === 'Space'){
+                if( game_mode === 'in_title' ){
+                    graphic.clearRect(0,0, CWidth, CHeight);
+                    game_mode = 'in_game';
+                    gamespeed = 1;
+                    change_gamespeed_flag = 1;
+                    timer = 0;
+                    wave_count = 1;
+                }
+            }
+        });
 
         if (title_mode === 'setting'){
             //半透明(透明度70%)の暗い四角を画面全体に表示
