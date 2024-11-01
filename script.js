@@ -23,28 +23,28 @@ let wave_count = 0;
 let wave_mode = 'calm';
 let wave_contents = [
     { type: 'green', move_interval: 60, spawnSec: 1  ,HP: 20},
-    { type: 'blue', move_interval: 60, spawnSec: 4  ,HP: 30},
-    { type: 'orange', move_interval: 45, spawnSec: 7 ,HP: 10},
-    { type: 'gold', move_interval: 60, spawnSec: 10 ,HP: 40},
+    { type: 'green', move_interval: 60, spawnSec: 4  ,HP: 30},
+    { type: 'green', move_interval: 45, spawnSec: 7 ,HP: 10},
+    { type: 'green', move_interval: 60, spawnSec: 10 ,HP: 40},
     { type: 'boss', move_interval: 120, spawnSec: 15, HP:100},
-    { type: 'gold', move_interval: 60, spawnSec: 20 , HP: 40},
-    { type: 'orange', move_interval: 60, spawnSec: 23 , HP: 50},
-    { type: 'pink', move_interval: 50, spawnSec: 26 , HP: 30},
+    { type: 'green', move_interval: 60, spawnSec: 20 , HP: 40},
+    { type: 'pink', move_interval: 60, spawnSec: 23 , HP: 50},
+    { type: 'green', move_interval: 50, spawnSec: 26 , HP: 30},
     { type: 'green', move_interval: 60, spawnSec: 30 , HP: 50},
     { type: 'boss', move_interval: 240, spawnSec: 34 ,HP:450},
-    { type: 'green', move_interval: 55, spawnSec: 41 , HP: 60},
+    { type: 'orange', move_interval: 55, spawnSec: 41 , HP: 60},
     { type: 'green', move_interval: 60, spawnSec: 43 , HP: 90},
     { type: 'blue', move_interval: 30, spawnSec: 46 , HP: 50},
     { type: 'green', move_interval: 60, spawnSec: 50 ,HP: 50},
     { type: 'boss', move_interval: 90, spawnSec: 54 ,HP: 400},
     { type: 'green', move_interval: 80, spawnSec: 55 ,HP: 50},
     { type: 'green', move_interval: 40, spawnSec: 59 ,HP: 80},
-    { type: 'green', move_interval: 60, spawnSec: 60 ,HP: 90},
+    { type: 'orange', move_interval: 60, spawnSec: 60 ,HP: 90},
     { type: 'green', move_interval: 62, spawnSec: 63 ,HP: 100},
     { type: 'boss', move_interval: 65, spawnSec: 65 ,HP: 400},
     { type: 'green', move_interval: 20, spawnSec: 68 ,HP: 10},
     { type: 'green', move_interval: 63, spawnSec: 70 ,HP: 110},
-    { type: 'green', move_interval: 60, spawnSec: 72 ,HP: 120},
+    { type: 'gold', move_interval: 60, spawnSec: 72 ,HP: 120},
     { type: 'green', move_interval: 40, spawnSec: 23 ,HP: 70},
     { type: 'boss', move_interval: 100, spawnSec: 23 ,HP: 1000},
 ];
@@ -65,7 +65,7 @@ const enemy_move_imgs = {
     green: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_green_move/${i + 1}.PNG`),
     blue: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_blue_move/${i + 1}.PNG`),
     orange: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_orange_move/${i + 1}.PNG`),
-    purple: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_purple_move/${i + 1}.PNG`),
+    pink: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_pink_move/${i + 1}.PNG`),
     gold: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_gold_move/${i + 1}.PNG`),
     boss: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_boss_move/${i + 1}.PNG`)
 };
@@ -164,7 +164,7 @@ class Map{
 
         this.map_data = map_data;
         this.enemy_base = [0,0];
-        this.player_base = [8,4];
+        this.player_base = [8,5];
         this.vrble_width = graphic.canvas.width / Object.keys(this.map_data[0]).length;
         this.vrble_height = this.vrble_width
         // this.vrble_height = graphic.canvas.height / Object.keys(this.map_data).length;
@@ -551,6 +551,13 @@ class Enemy{
             this.isDead = true;
             if(this.type === 'gold'){
                 player.resource++;
+            }
+
+            if(this.type === 'boss'){
+                let boss_random = Math.floor(Math.random() * 5);
+                if(boss_random === 0){
+                    player.resource++;
+                }
             }
         }
     }
