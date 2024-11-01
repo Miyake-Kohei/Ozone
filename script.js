@@ -938,16 +938,10 @@ function gameloop(){
                 });
                 btn_title_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H, ()=>{
                     console.log('せってい');
-                    title_mode = 'setting'
+                    title_mode = 'setting';
                 });
                 btn_title_start.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
                     console.log('はじめる');
-                    graphic.clearRect(0,0, CWidth, CHeight);
-                    game_mode = 'in_game';
-                    gamespeed = 1;
-                    change_gamespeed_flag = 1;
-                    timer = 0;
-                    wave_count = 1;
                 });
             }
 
