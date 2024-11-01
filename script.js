@@ -4,6 +4,7 @@ let enemies_resize = [];
 let turrets = [];
 let bullets = [];
 let game_mode = 'in_title';
+let title_mode = 'main';
 let map,player;
 let pointer = {
     "x":0,
@@ -22,30 +23,30 @@ let wave_count = 0;
 let wave_mode = 'calm';
 let wave_contents = [
     { type: 'green', move_interval: 60, spawnSec: 1  ,HP: 20},
-    { type: 'green', move_interval: 60, spawnSec: 4  ,HP: 30},
-    { type: 'green', move_interval: 45, spawnSec: 7 ,HP: 10},
-    { type: 'green', move_interval: 60, spawnSec: 10 ,HP: 40},
-    { type: 'gold', move_interval: 120, spawnSec: 15, HP:100},
-    { type: 'blue', move_interval: 60, spawnSec: 20 , HP: 40},
+    { type: 'blue', move_interval: 60, spawnSec: 4  ,HP: 30},
+    { type: 'orange', move_interval: 45, spawnSec: 7 ,HP: 10},
+    { type: 'gold', move_interval: 60, spawnSec: 10 ,HP: 40},
+    { type: 'boss', move_interval: 120, spawnSec: 15, HP:100},
+    { type: 'gold', move_interval: 60, spawnSec: 20 , HP: 40},
     { type: 'orange', move_interval: 60, spawnSec: 23 , HP: 50},
     { type: 'pink', move_interval: 50, spawnSec: 26 , HP: 30},
     { type: 'green', move_interval: 60, spawnSec: 30 , HP: 50},
-    { type: 'gold', move_interval: 240, spawnSec: 34 ,HP:450},
+    { type: 'boss', move_interval: 240, spawnSec: 34 ,HP:450},
     { type: 'green', move_interval: 55, spawnSec: 41 , HP: 60},
     { type: 'green', move_interval: 60, spawnSec: 43 , HP: 90},
     { type: 'blue', move_interval: 30, spawnSec: 46 , HP: 50},
     { type: 'green', move_interval: 60, spawnSec: 50 ,HP: 50},
-    { type: 'gold', move_interval: 90, spawnSec: 54 ,HP: 250},
+    { type: 'boss', move_interval: 90, spawnSec: 54 ,HP: 400},
     { type: 'green', move_interval: 80, spawnSec: 55 ,HP: 50},
     { type: 'green', move_interval: 40, spawnSec: 59 ,HP: 80},
     { type: 'green', move_interval: 60, spawnSec: 60 ,HP: 90},
     { type: 'green', move_interval: 62, spawnSec: 63 ,HP: 100},
-    { type: 'gold', move_interval: 120, spawnSec: 65 ,HP: 500},
+    { type: 'boss', move_interval: 65, spawnSec: 65 ,HP: 400},
     { type: 'green', move_interval: 20, spawnSec: 68 ,HP: 10},
     { type: 'green', move_interval: 63, spawnSec: 70 ,HP: 110},
     { type: 'green', move_interval: 60, spawnSec: 72 ,HP: 120},
-    { type: 'green', move_interval: 40, spawnSec: 74 ,HP: 70},
-    { type: 'gold', move_interval: 150, spawnSec: 78 ,HP: 700},
+    { type: 'green', move_interval: 40, spawnSec: 23 ,HP: 70},
+    { type: 'boss', move_interval: 100, spawnSec: 23 ,HP: 1000},
 ];
 let random_speed = 0;
 let random_contents = 3;
@@ -64,8 +65,9 @@ const enemy_move_imgs = {
     green: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_green_move/${i + 1}.PNG`),
     blue: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_blue_move/${i + 1}.PNG`),
     orange: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_orange_move/${i + 1}.PNG`),
-    pink: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_pink_move/${i + 1}.PNG`),
-    gold: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_gold_move/${i + 1}.PNG`)
+    purple: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_purple_move/${i + 1}.PNG`),
+    gold: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_gold_move/${i + 1}.PNG`),
+    boss: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_boss_move/${i + 1}.PNG`)
 };
 
 
@@ -296,7 +298,7 @@ class Turret{
         this.animas_idx = 1;
         // 過去書いた処理を使うための代入。
         // this.animas内の要素はどれも大きさ同じなので[0]を使用。
-        console.log('sadfsaf', this.animas[0])
+        // console.log('sadfsaf', this.animas[0])
         this.pict = this.animas[0];
         let damagechip =[
             17,11,57
@@ -589,7 +591,93 @@ class ResizeStaticImg{
             this.width,this.height); // 表示全体を、絵・枠両方拡大
             // this.originalImgs[0].width,this.originalImgs[0].height);
     }
+    draw2(x0,y0,w0,h0){
+        graphic.drawImage(
+            this.resizeCanvas,
+            x0,y0,
+            w0,h0); // 表示全体を、絵・枠両方拡大
+            // this.originalImgs[0].width,this.originalImgs[0].height);
+    }
 }
+
+// 要グローバル変数：game_mode
+class ClickableButton {
+    constructor(_img_path, _allow_mode, _callback) {
+        // システム側：クリック範囲を指定する
+        this.x = 0;
+        this.y = 0;
+        this.w = 0;
+        this.h = 0;
+        this.allow_mode = _allow_mode;
+        this.callback; 
+        // クリック時に実行される処理（関数）
+        document.addEventListener("mousedown", this.handleMouseDown.bind(this));
+
+        // 描画側：リサイズして描画
+        this.originalImg = new Image();
+        this.originalImg.src = _img_path;
+        this.resizeCanvas = document.createElement('canvas');
+        this.resizeCanvas_ctx = this.resizeCanvas.getContext('2d');
+        
+        this.originalImg.onload = () => {
+            this.resizeCanvas.width = 1920;
+            this.resizeCanvas.height = 1080;
+            this.resizeCanvas_ctx.drawImage(
+                this.originalImg,   // 描画obj
+                0,0,                // 切り取り開始座標
+                this.originalImg.width, this.originalImg.height, // 切り取り幅
+                0,0,                // キャンバス上の描画開始座標
+                this.resizeCanvas.width,this.resizeCanvas.height);
+                // 300, 150); //描画サイズ（not枠）。ここを切れるぎりぎりに調節する。
+        }
+    }
+    
+    draw_and_define(x0,y0,w0,h0,callback0){
+        // この関数が呼び出されて初めてボタン位置・大きさがちゃんと決まる
+        this.x = x0;
+        this.y = y0;
+        this.w = w0;
+        this.h = h0;
+        this.callback = callback0;
+        graphic.drawImage(
+            this.resizeCanvas,
+            x0,y0,
+            w0,h0); // 表示全体を、絵・枠両方拡大
+
+        // デバッグ用：クリック判定範囲を赤い枠線で表示
+        if (false){
+            graphic.beginPath();
+            graphic.strokeStyle = 'red'; // 枠線の色
+            graphic.lineWidth = 3; // 枠線の太さ
+            graphic.strokeRect(x0, y0, w0, h0);
+            // console.log(this.x,this.y,this.w,this.h);
+        }
+        
+    }
+
+    // 範囲内のクリックか判定するメソッド
+    isWithinBounds(clickX, clickY) {
+        return (
+            clickX >= this.x &&
+            clickX <= this.x + this.w &&
+            clickY >= this.y &&
+            clickY <= this.y + this.h
+        );
+    }
+    // マウスダウン時の処理
+    handleMouseDown(event) {
+        const clickX = event.offsetX; //offsetX...canvas自体の左上を基準とした座標
+        const clickY = event.offsetY;
+        // クリック位置が範囲内ならコールバックを実行
+        // game_mo...の条件がないと意図しないgame_mode上で処理が働いてしまう
+        if (game_mode === this.allow_mode && this.isWithinBounds(clickX, clickY)) {
+        // if (this.isWithinBounds(clickX, clickY)) {
+            this.callback();
+        }
+    }
+}
+
+
 
 onload = function(){
     canvas = document.getElementById("game");
@@ -747,8 +835,8 @@ function keyup(e){
 
 function mousedown(e){
     player.grab();
-    console.log('x', e.pageX)
-    console.log('y', e.pageY)
+    // console.log('x', e.offsetX)
+    // console.log('y', e.offsetY)
 }
 
 function mouseup(e){
@@ -831,43 +919,6 @@ function resizeImages(CHIP, TILE_SIZE, _inv='', _offsetX=0, _offsetY=0) {
     return resizedImages;
 }
 
-// 失敗作（バグります）
-// async function resizeImages_async(CHIP, TILE_SIZE) {
-//     // リサイズ済み画像を格納する配列
-//     const resizedImages = [];
-
-//     for (let i = 0; i < CHIP.length; i++) {
-//         const image = new Image();
-//         image.src = CHIP[i]; // 画像のソースを設定
-
-//         // 拡縮された画像を保持するためのキャンバスを作成
-//         const canvas = document.createElement('canvas');
-//         canvas.width = TILE_SIZE;
-//         canvas.height = TILE_SIZE;
-//         const ctx = canvas.getContext('2d');
-
-//         return new Promise(
-//             (resolve) => {
-//                 image.onload = () => {
-//                     resolve(image);
-//                 };
-//                 ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, TILE_SIZE, TILE_SIZE);
-//                 resizedImages.push(canvas);
-//             }
-//         )
-//         // onloadでキャンバスに描画する
-//         image.onload = () => {
-//             // 元の画像を指定のサイズにリサイズして描画
-//             ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, TILE_SIZE, TILE_SIZE);
-//         };
-
-//         // リサイズされた画像(canvas)を配列に追加
-//         resizedImages.push(canvas);
-//     }
-
-//     // リサイズ済み画像の配列を返す
-//     return resizedImages;
-// }
 
 function drawText(ctx, text, x, y, size, color) {
     ctx.font = `${size}px hanazome`;
@@ -878,9 +929,20 @@ function drawText(ctx, text, x, y, size, color) {
 
 
 // 描画用変数（クラスより上側に配置するとreference error）
-// 「h」の値はいい感じに調節してください。
-let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
+const BUTTON_W = 150
+const BUTTON_H = 300*BUTTON_W/700
+console.log({BUTTON_H})
+let title_img_obj = new ResizeStaticImg('img/title.png', 0, 0, HTML_WIDTH, HTML_HEIGHT-80); //path,x,y,w,h
 let result_img_obj = new ResizeStaticImg('img/result.png', 0, 0, HTML_WIDTH, HTML_HEIGHT); //path,x,y,w,h
+let logo_img_obj = new ResizeStaticImg('img/title_logo.png') // 1280*1280
+
+// 「ボタン」オブジェ
+let btn_title_exit = new ClickableButton('img/buttons/button_exit.png', 'in_title');
+let btn_title_setting = new ClickableButton('img/buttons/button_setting.png', 'in_title');
+let btn_title_start = new ClickableButton('img/buttons/button_start.png', 'in_title');
+
+let btn_result_exit = new ClickableButton('img/buttons/button_exit.png', 'in_result');
+
 
 
 function gameloop(){
@@ -898,22 +960,97 @@ function gameloop(){
         animation_time = 0;
         change_gamespeed_time = 0;
 
-        title_img_obj.draw()    
-        drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
-        drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
+        //描画の処理
+        //下枠
+        graphic.fillStyle = "rgba(" + [50,50,50] + ")";
+        graphic.fillRect(0,0,canvas.width,canvas.height);
+        // タイトル
+        title_img_obj.draw()
+        // ロゴ
+        logo_x = 17
+        logo_y = -10+2*Math.sin(timer/20)
+        logo_s = 300
+        logo_img_obj.draw2(logo_x,logo_y,logo_s,logo_s);
         
-        window.addEventListener('keyup', event => {
-            if(event.code === 'Space'){
-                if( game_mode === 'in_title' ){
+        // drawText(graphic, "Sweet Rush Tower", CWidth/2, CHeight*600/720-300, 60, "rgb(50, 50, 50)");
+        // drawText(graphic, "Press [SPACE] to start", CWidth/2, CHeight*600/720, 50, "rgb(50, 50, 50)");
+        
+        if (title_mode === 'main'){
+            // タイトルのボタン群
+            { //{}で囲むと、この中で定義された変数は外部からアクセスできない（即時実行関数式）
+                const CH = 428
+                const CX1 = HTML_WIDTH*1/6-BUTTON_W/2
+                const CX2 = HTML_WIDTH*3/6-BUTTON_W/2
+                const CX3 = HTML_WIDTH*5/6-BUTTON_W/2
+                btn_title_exit.draw_and_define(CX1, CH, BUTTON_W, BUTTON_H, ()=>{
+                    console.log('おわる');
+                    window.location.reload(); //ブラウザの再読み込み
+                });
+                btn_title_setting.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H, ()=>{
+                    console.log('せってい');
+                    title_mode = 'setting';
+                });
+                btn_title_start.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
+                    console.log('はじめる');
                     graphic.clearRect(0,0, CWidth, CHeight);
                     game_mode = 'in_game';
                     gamespeed = 1;
                     change_gamespeed_flag = 1;
                     timer = 0;
                     wave_count = 1;
-                }
+                    enemies = [];
+                });
             }
-        });
+
+            window.addEventListener('keyup', event => {
+                if(event.code === 'Space'){
+                    if( game_mode === 'in_title' ){
+                        graphic.clearRect(0,0, CWidth, CHeight);
+                        game_mode = 'in_game';
+                        gamespeed = 1;
+                        change_gamespeed_flag = 1;
+                        timer = 0;
+                        wave_count = 1;
+                    }
+                }
+            });
+        }
+
+        if (title_mode === 'setting'){
+            //半透明(透明度70%)の暗い四角を画面全体に表示
+            graphic.beginPath();
+            graphic.fillStyle = "rgba(" + [0, 0, 0, 0.7] + ")";
+            graphic.fillRect(0, 0, CWidth, CHeight);  
+            
+            ///ボタン無効化処理
+            btn_title_exit.draw_and_define(0,0,0,0, ()=>{});
+            btn_title_setting.draw_and_define(0,0,0,0, ()=>{});
+            btn_title_start.draw_and_define(0,0,0,0, ()=>{});
+            
+            { //{}で囲むと、この中で定義された変数は外部からアクセスできない（即時実行関数式）
+                const CH = 428
+                const CX2 = HTML_WIDTH*3/6-BUTTON_W/2
+                btn_title_exit.draw_and_define(CX2, CH, BUTTON_W, BUTTON_H, ()=>{
+                    console.log('おわる');
+                    title_mode = 'main';
+                });
+            }
+
+            //説明文デモ
+            sentence = [
+                "🌟Sweet Rush Towerへようこそ！🌟",
+                "ここでは、色とりどりの敵たちが通路を抜けようと攻めてきます。",
+                "あなたの使命はキャラクターを巧みに配置して、守ることです。",
+                "🛡️ 挑戦が待っているエンドレスモード",
+                "徐々に強まる敵の波に対し、あなたの戦略と判断力が試されます。",
+                "数多くのタワーをそろえ、敵を撃退し、無限の挑戦に立ち向かえ！"
+            ]
+            for (let i in sentence){
+                drawText(graphic, sentence[i], CWidth/2, 100+50*i, 20, "rgb(250, 250, 250)");
+            }
+            
+
+        }      
     }
 
     if( game_mode === 'in_game' ){
@@ -1018,7 +1155,21 @@ function gameloop(){
         
         result_img_obj.draw()
         drawText(graphic, "Result", CWidth*3/4, CHeight/8, 60, "rgb(100, 100, 100)");
-        
+
+        drawText(graphic, `到達したwave：${wave_count}`, CWidth*3/4, CHeight/8+75, 20, "rgb(100, 100, 100)");
+        drawText(graphic, `倒した敵の数：`, CWidth*3/4, CHeight/8+125, 20, "rgb(100, 100, 100)");
+        drawText(graphic, `与えたダメージ：`, CWidth*3/4, CHeight/8+175, 20, "rgb(100, 100, 100)");
+        drawText(graphic, `経過時間(game内)：`, CWidth*3/4, CHeight/8+225, 20, "rgb(100, 100, 100)");
+        // 戻るボタン
+        {//即時実行関数
+            const CH = 428
+            const CX3 = HTML_WIDTH*5/6-BUTTON_W/2
+            btn_result_exit.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
+                console.log('おわる');
+                game_mode = 'in_title'
+                graphic.clearRect(0,0, CWidth, CHeight);
+            });
+        }
     }
 
 
