@@ -26,27 +26,27 @@ let wave_contents = [
     { type: 'blue', move_interval: 60, spawnSec: 4  ,HP: 30},
     { type: 'orange', move_interval: 45, spawnSec: 7 ,HP: 10},
     { type: 'gold', move_interval: 60, spawnSec: 10 ,HP: 40},
-    { type: 'blue', move_interval: 120, spawnSec: 15, HP:100},
+    { type: 'boss', move_interval: 120, spawnSec: 15, HP:100},
     { type: 'gold', move_interval: 60, spawnSec: 20 , HP: 40},
     { type: 'orange', move_interval: 60, spawnSec: 23 , HP: 50},
     { type: 'green', move_interval: 50, spawnSec: 26 , HP: 30},
     { type: 'green', move_interval: 60, spawnSec: 30 , HP: 50},
-    { type: 'orange', move_interval: 240, spawnSec: 34 ,HP:450},
+    { type: 'boss', move_interval: 240, spawnSec: 34 ,HP:450},
     { type: 'green', move_interval: 55, spawnSec: 41 , HP: 60},
     { type: 'green', move_interval: 60, spawnSec: 43 , HP: 90},
     { type: 'green', move_interval: 30, spawnSec: 46 , HP: 50},
     { type: 'green', move_interval: 60, spawnSec: 50 ,HP: 50},
-    { type: 'green', move_interval: 90, spawnSec: 54 ,HP: 400},
+    { type: 'boss', move_interval: 90, spawnSec: 54 ,HP: 400},
     { type: 'green', move_interval: 80, spawnSec: 55 ,HP: 50},
     { type: 'green', move_interval: 40, spawnSec: 59 ,HP: 80},
     { type: 'green', move_interval: 60, spawnSec: 60 ,HP: 90},
     { type: 'green', move_interval: 62, spawnSec: 63 ,HP: 100},
-    { type: 'green', move_interval: 65, spawnSec: 65 ,HP: 400},
+    { type: 'boss', move_interval: 65, spawnSec: 65 ,HP: 400},
     { type: 'green', move_interval: 20, spawnSec: 68 ,HP: 10},
     { type: 'green', move_interval: 63, spawnSec: 70 ,HP: 110},
     { type: 'green', move_interval: 60, spawnSec: 72 ,HP: 120},
     { type: 'green', move_interval: 40, spawnSec: 23 ,HP: 70},
-    { type: 'green', move_interval: 100, spawnSec: 23 ,HP: 1000},
+    { type: 'boss', move_interval: 100, spawnSec: 23 ,HP: 1000},
 ];
 let random_speed = 0;
 let random_contents = 3;
@@ -66,7 +66,8 @@ const enemy_move_imgs = {
     blue: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_blue_move/${i + 1}.PNG`),
     orange: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_orange_move/${i + 1}.PNG`),
     purple: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_purple_move/${i + 1}.PNG`),
-    gold: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_gold_move/${i + 1}.PNG`)
+    gold: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_gold_move/${i + 1}.PNG`),
+    boss: Array.from({ length: 14 }, (_, i) => `img/enemy/enemy_boss_move/${i + 1}.PNG`)
 };
 
 
@@ -948,6 +949,7 @@ function gameloop(){
                     change_gamespeed_flag = 1;
                     timer = 0;
                     wave_count = 1;
+                    enemies = [];
                 });
             }
 
