@@ -39,7 +39,7 @@ let wave_contents = [
     { type: 'green', move_interval: 60, spawnSec: 43 , HP: 90},
     { type: 'blue', move_interval: 30, spawnSec: 46 , HP: 30},
     { type: 'green', move_interval: 60, spawnSec: 50 ,HP: 110},
-    { type: 'boss', move_interval: 90, spawnSec: 54 ,HP: 300},
+    { type: 'boss', move_interval: 90, spawnSec: 54 ,HP: 250},
     { type: 'green', move_interval: 80, spawnSec: 55 ,HP: 100},
     { type: 'green', move_interval: 40, spawnSec: 59 ,HP: 70},
     { type: 'orange', move_interval: 60, spawnSec: 60 ,HP: 130},
@@ -785,7 +785,7 @@ function addEnemy(_move_interval,HP,_enemy_type){
     let change_enemy_type = Math.floor( Math.random() * 100);
 
     if(_enemy_type === 'green'){
-        if(wave_count >= 7){
+        if(wave_count >= 3){
             if(change_enemy_type >= 82 && change_enemy_type <= 86){
                 _enemy_type = 'blue';
             }
@@ -1037,7 +1037,14 @@ function gameloop(){
                     damage_cal = 0;
                     num_enemy_dead = 0;
                     turrets = [];
-                    map.map_data = map_data;
+                    map.map_data = [
+                        [0,1,0,0,0,1,0,0,0,1],
+                        [0,1,0,1,0,1,0,1,0,1],
+                        [0,1,0,1,0,1,0,1,0,1],
+                        [0,1,0,1,0,1,0,1,0,1],
+                        [0,1,0,1,0,1,0,1,0,1],
+                        [0,0,0,1,0,0,0,1,0,1],
+                    ];
                 });
             }
         }
