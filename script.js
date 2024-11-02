@@ -695,6 +695,10 @@ window.addEventListener('load', () => {
 });
 
 
+window.addEventListener('load', () => {
+});
+
+
 onload = function(){
     canvas = document.getElementById("game");
     graphic = canvas.getContext("2d");
@@ -1018,6 +1022,7 @@ function gameloop(){
                 });
                 btn_title_start.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
                     console.log('はじめる');
+                    bgm.play()
                     graphic.clearRect(0,0, CWidth, CHeight);
                     game_mode = 'in_game';
                     gamespeed = 1;
@@ -1032,7 +1037,7 @@ function gameloop(){
                     num_enemy_dead = 0;
                     turrets = [];
                 });
-            }
+    }
         }
 
         if (title_mode === 'setting'){
