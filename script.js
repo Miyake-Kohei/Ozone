@@ -1,4 +1,4 @@
-let canvas,graphic,CWidth,CHeight;
+let canvas,graphic,CWidth,CHeight,bgm;
 let enemies = [];
 let enemies_resize = [];
 let turrets = [];
@@ -12,6 +12,9 @@ let pointer = {
 }
 let gamespeed = 1;
 let timer = 0;
+let game_timer = 0;
+let damage_cal = 0;
+let num_enemy_dead = 0;
 let animation_time = 0;
 let current_spawn = 0;
 let change_gamespeed_flag = 0;
@@ -41,12 +44,12 @@ let wave_contents = [
     { type: 'green', move_interval: 40, spawnSec: 59 ,HP: 80},
     { type: 'orange', move_interval: 60, spawnSec: 60 ,HP: 90},
     { type: 'green', move_interval: 62, spawnSec: 63 ,HP: 100},
-    { type: 'boss', move_interval: 65, spawnSec: 65 ,HP: 400},
+    { type: 'boss', move_interval: 200, spawnSec: 65 ,HP: 700},
     { type: 'green', move_interval: 20, spawnSec: 68 ,HP: 10},
-    { type: 'green', move_interval: 63, spawnSec: 70 ,HP: 110},
+    { type: 'blue', move_interval: 63, spawnSec: 70 ,HP: 110},
     { type: 'gold', move_interval: 60, spawnSec: 72 ,HP: 120},
     { type: 'green', move_interval: 40, spawnSec: 23 ,HP: 70},
-    { type: 'boss', move_interval: 100, spawnSec: 23 ,HP: 1000},
+    { type: 'boss', move_interval: 130, spawnSec: 23 ,HP: 1000},
 ];
 let random_speed = 0;
 let random_contents = 3;
@@ -301,7 +304,7 @@ class Turret{
         // console.log('sadfsaf', this.animas[0])
         this.pict = this.animas[0];
         let damagechip =[
-            17,11,57
+            20,15,60
         ];
         this.damage = damagechip[this.id];
     }
@@ -532,23 +535,27 @@ class Enemy{
 
         if(enemy_id === 3){
             this.hp -= damage;
+            damage_cal += damage;
         }
 
         // 特定タレットのみ攻撃を通す処理
         else{
             if(enemy_id === id){
-                this.hp -= damage * 10;
-                console.log("critical!")
+                this.hp -= damage * 5;
+                console.log("critical!");
+                damage_cal += damage * 5;
             }
             else{
                 this.hp -= Math.floor( damage / 5);
                 console.log("sorry")
+                damage_cal += Math.floor( damage / 5);
             }
         }
     }
     dead(){
         if(this.hp <= 0){
             this.isDead = true;
+            num_enemy_dead += 1;
             if(this.type === 'gold'){
                 player.resource++;
             }
@@ -684,11 +691,18 @@ class ClickableButton {
     }
 }
 
+window.addEventListener('load', () => {
+});
+
+
+window.addEventListener('load', () => {
+});
 
 
 onload = function(){
     canvas = document.getElementById("game");
     graphic = canvas.getContext("2d");
+    bgm = document.getElementById('bgm');
 
     //フォント読み込み
     document.fonts.load('10pt"hanazome"');
@@ -766,8 +780,10 @@ function addEnemy(_move_interval,HP,_enemy_type){
     if(_enemy_speed <= 0){
         _enemy_speed = 1;
     }
+
+    let change_enemy_type = Math.floor( Math.random() * 100);
+
     if(_enemy_type === 'green'){
-        let change_enemy_type = Math.floor( Math.random() * 100);
         if(wave_count >= 7){
             if(change_enemy_type >= 82 && change_enemy_type <= 86){
                 _enemy_type = 'blue';
@@ -785,6 +801,13 @@ function addEnemy(_move_interval,HP,_enemy_type){
             _enemy_type = 'gold';
         }
     }
+
+    if(_enemy_type != 'boss'){
+        if(change_enemy_type > 96){
+            _enemy_type = 'gold';
+        }
+    }
+
     let enemy = new Enemy(0, map.enemy_base[1], map.enemy_base[0], img_enemychip, _enemy_speed,Math.floor(HP * enemy_level), _enemy_type); //id,x,y,enemychip,speed,HP最後の引数はスピードで，小さいほど速くなる（0以下だとエラーが起こる．）
     console.log(enemy.hp)
     enemies.push(enemy);
@@ -999,28 +1022,22 @@ function gameloop(){
                 });
                 btn_title_start.draw_and_define(CX3, CH, BUTTON_W, BUTTON_H, ()=>{
                     console.log('はじめる');
+                    bgm.play()
                     graphic.clearRect(0,0, CWidth, CHeight);
                     game_mode = 'in_game';
                     gamespeed = 1;
                     change_gamespeed_flag = 1;
                     timer = 0;
+                    player.resource = 2;
                     wave_count = 1;
+                    current_spawn = 0;
                     enemies = [];
+                    game_timer = 0;
+                    damage_cal = 0;
+                    num_enemy_dead = 0;
+                    turrets = [];
                 });
-            }
-
-            window.addEventListener('keyup', event => {
-                if(event.code === 'Space'){
-                    if( game_mode === 'in_title' ){
-                        graphic.clearRect(0,0, CWidth, CHeight);
-                        game_mode = 'in_game';
-                        gamespeed = 1;
-                        change_gamespeed_flag = 1;
-                        timer = 0;
-                        wave_count = 1;
-                    }
-                }
-            });
+    }
         }
 
         if (title_mode === 'setting'){
@@ -1104,6 +1121,7 @@ function gameloop(){
 
 
         if(wave_mode === 'battle'){
+            game_timer += 1;
             drawText(graphic, `wave:  ${wave_count}`, CWidth*3/4, CHeight*5/6+20, 20, "rgb(150, 150, 150)");
             spawn_flag = wave_contents[current_spawn % 25];
 
@@ -1160,13 +1178,14 @@ function gameloop(){
     }
     if (game_mode === 'in_result') {
         
+        wave_mode = 'calm';
         result_img_obj.draw()
         drawText(graphic, "Result", CWidth*3/4, CHeight/8, 60, "rgb(100, 100, 100)");
 
         drawText(graphic, `到達したwave：${wave_count}`, CWidth*3/4, CHeight/8+75, 20, "rgb(100, 100, 100)");
-        drawText(graphic, `倒した敵の数：`, CWidth*3/4, CHeight/8+125, 20, "rgb(100, 100, 100)");
-        drawText(graphic, `与えたダメージ：`, CWidth*3/4, CHeight/8+175, 20, "rgb(100, 100, 100)");
-        drawText(graphic, `経過時間(game内)：`, CWidth*3/4, CHeight/8+225, 20, "rgb(100, 100, 100)");
+        drawText(graphic, `倒した敵の数：${num_enemy_dead}`, CWidth*3/4, CHeight/8+125, 20, "rgb(100, 100, 100)");
+        drawText(graphic, `与えたダメージ：${damage_cal}`, CWidth*3/4, CHeight/8+175, 20, "rgb(100, 100, 100)");
+        drawText(graphic, `経過時間(game内):${Math.round(game_timer/60)}秒`, CWidth*3/4, CHeight/8+225, 20, "rgb(100, 100, 100)");
         // 戻るボタン
         {//即時実行関数
             const CH = 428
