@@ -174,6 +174,9 @@ class Map{
             this.tiles[i] = this.resized_img(mapchip[i], 64)
         }
 
+        this.resized_base_good = resizeImages(['img/good.PNG'], 64)
+        this.resized_base_bad = resizeImages(['img/bad.PNG'], 64)
+
         this.map_data = map_data;
         this.enemy_base = [0,0];
         this.player_base = [8,5];
@@ -193,6 +196,18 @@ class Map{
                 // ↓ をここと置き換えるとバグの温床になりそうなので、考え中（タレットの床番号が2であるため）
                 // let tileIndex = this.map_data[y][x]
                 // graphic.drawImage(this.tiles[tileIndex], this.TILE_SIZE*x, this.TILE_SIZE*y);
+        if (game_mode === 'in_game') {
+            graphic.drawImage(
+                this.resized_base_good[0],
+                this.TILE_SIZE*this.player_base[0],
+                this.TILE_SIZE*this.player_base[1]-8);   
+        }
+        if (game_mode === 'in_gameover') {
+            graphic.drawImage(
+                this.resized_base_bad[0],
+                this.TILE_SIZE*this.player_base[0],
+                this.TILE_SIZE*this.player_base[1]-8);
+        }
             }
         }
     }
@@ -744,7 +759,7 @@ function init(){
     const img_turretchip = [
         'img/dot_chara1.png',
         'img/dot_chara2.png',
-        'img/dot_chara3.png'
+        'img/dot_chara3.png' 
     ]
     // const img_turretchip = [
     //     'img/turret_temp1.png',
