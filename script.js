@@ -199,7 +199,6 @@ class Map{
                 this.TILE_SIZE*this.player_base[0],
                 this.TILE_SIZE*this.player_base[1]-8);
         }
-
             }
         }
     }
